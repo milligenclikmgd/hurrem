@@ -10,83 +10,97 @@ if(courtyard){courtyard.updateMatrixWorld(true);
  // V3 meydanı kendi özgün geometrisiyle kullanılır; kodla uzatma yapılmaz.
  const meshes=[];courtyard.traverse(o=>{if(o.isMesh&&!/Sky|Cloud|Dome|Roof|Wall|Canopy/i.test(o.name))meshes.push(o)});const ray=new THREE.Raycaster();for(const p of people){ray.set(new THREE.Vector3(p.position.x,4,p.position.z),new THREE.Vector3(0,-1,0));const hits=ray.intersectObjects(meshes,false);const floor=hits.find(h=>h.point.y>=-.15&&h.point.y<=.6&&h.face&&h.face.normal.y>.45);if(floor)p.position.y=floor.point.y;}}
 
-// Katılım ve yürüyüş: yerel test altyapısı. Gerçek LIVE olayları bağlanınca
-// window.weddingLive.join(username) / .gift(giftName) kullanılabilir.
-const $=id=>document.getElementById(id),MAX_GUESTS=90;
+// TikTok LIVE bağlayıcısına hazır alay sistemi. Ses dosyaları ayrıca lisanslı olarak yüklenmelidir.
+const $=id=>document.getElementById(id),MAX_GUESTS=90,roster=new Map();
 const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
-const procession=people.filter(p=>p.userData.name==='Kanuni'||p.userData.name==='Hürrem');
-const roster=new Map();let phase='idle',remaining=30,startedAt=0,marchStart=0,marchBase=new Map();
-const melody=[
- {notes:[196,247,294,330,294,247,220,196],beat:260,style:'mehter'},
- {notes:[262,330,392,440,392,330,294,262],beat:330,style:'wedding'},
- {notes:[294,294,440,392,330,294,262,294],beat:210,style:'zurna'},
- {notes:[220,277,330,440,392,330,277,220],beat:270,style:'mehter'},
- {notes:[330,392,440,523,440,392,330,294],beat:195,style:'wedding'}
-];
-let audio=null,musicOn=false,trackIndex=0,nextNote=0,noteIndex=0;
-function tone(freq,when,duration,type='triangle',volume=.05){
- const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);
- g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(volume,when+.018);
- g.gain.exponentialRampToValueAtTime(.0001,when+duration);
- o.connect(g).connect(audio.destination);o.start(when);o.stop(when+duration+.025);
+const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
+const procession=[...royal],entryZ=20.5,stageZ=-11,walkSpeed=.12;
+const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
+let phase='countdown',startedAt=performance.now(),marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
+const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
+const tracks=['mehter-1.mp3','dugun-1.mp3','davul-zurna-1.mp3','mehter-2.mp3','dugun-2.mp3'];
+let musicOn=false;
+function showNote(msg){$('gameNote').textContent=msg}
+function switchTrack(index){
+ trackIndex=((index%5)+5)%5;$('track').value=String(trackIndex);
+ audioPlayer.src='./music/'+tracks[trackIndex];
+ if(musicOn)audioPlayer.play().catch(()=>showNote('Lisanslı MP3 dosyası music/ klasörüne yüklenmeli'));
+ showNote('Parça seçildi: '+$('track').selectedOptions[0].text+' · MP3 dosyası bekleniyor');
 }
-function scheduleMusic(){
- if(!musicOn||!audio)return;
- const song=melody[trackIndex];
- while(nextNote<audio.currentTime+.14){
-  const n=song.notes[noteIndex%song.notes.length],dur=song.beat/1000;
-  tone(n,nextNote,dur*.83,song.style==='zurna'?'sawtooth':'triangle',song.style==='zurna'?.026:.046);
-  if(song.style==='mehter')tone(n/2,nextNote,dur*.7,'sine',.032);
-  if(noteIndex%2===0)tone(90,nextNote,dur*.14,'sine',.065);
-  noteIndex++;nextNote+=dur;
+function cloneRole(role,name){
+ const base=templates[role];if(!base)return null;
+ const obj=base.clone(true);obj.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
+ obj.userData.name=name;obj.userData.role=role;obj.rotation.y=Math.PI;
+ scene.add(obj);return obj;
+}
+function slot(index){const row=Math.floor(index/2),side=index%2===0?-1:1;return {x:side*(.64+(row%3)*.13),z:entryZ+row*.49}}
+function joinGuest(name,role='male'){
+ const username=String(name||'').trim().slice(0,22);if(!username)return false;
+ if(roster.has(username))return changeRole(username,role);
+ if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
+ if(phase==='finished'){showNote('Tören sona erdi');return false}
+ if(!roles.includes(role))role='male';
+ const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
+ obj.position.set(point.x,0,point.z-walkDistance);obj.userData.slot=index;
+ roster.set(username,obj);procession.push(obj);
+ $('count').textContent=roster.size+'/90 kişi';showNote(username+' alaya katıldı · '+roleNames[role]);return true;
+}
+function changeRole(username,role){
+ const old=roster.get(username);if(!old||!roles.includes(role))return false;
+ if(old.userData.role===role)return true;
+ const replacement=cloneRole(role,username);if(!replacement)return false;
+ replacement.position.copy(old.position);replacement.rotation.copy(old.rotation);replacement.userData.slot=old.userData.slot;
+ const index=procession.indexOf(old);if(index>=0)procession[index]=replacement;
+ roster.set(username,replacement);scene.remove(old);showNote(username+' artık '+roleNames[role]);return true;
+}
+function receiveGift(name,gift='music'){
+ // Hediye haritası LIVE sağlayıcısının gerçek hediye ID'leriyle sonradan bağlanabilir.
+ const action=String(gift).toLowerCase();
+ if(['male','female','mehter'].includes(action))return joinGuest(name,action);
+ switchTrack(trackIndex+1);showNote('🎁 '+String(name||'İzleyici')+' · müzik değişti');return true;
+}
+function beginMarch(){
+ if(phase==='march'||phase==='finished')return;
+ phase='march';marchStart=performance.now();$('phase').textContent='Alay yavaşça yürüyor';
+ $('timer').textContent='YÜRÜYÜŞ';$('start').disabled=true;
+ showNote('Yürüyüş başladı · Yürürken katılım ve karakter değiştirme açık');
+}
+function seatEveryone(){
+ phase='finished';$('phase').textContent='Düğün merasimi';$('timer').textContent='TÖREN';
+ // Tahtın kesin koordinatları modelin iç düğüm konumlarına göre kalibre edilebilir.
+ royal.forEach((p,i)=>{p.position.set(i===0?-.4:.4,.25,stageZ);p.rotation.y=0});
+ for(const [name,p] of roster){
+  const idx=p.userData.slot;
+  if(p.userData.role==='mehter'){p.position.set(-2.5+(idx%7)*.52,0,stageZ+1.8);p.rotation.y=0}
+  else {const row=Math.floor(idx/2);p.position.set((idx%2===0?-1:1)*2.3,0,stageZ+2.5+row*.44);p.rotation.y=0}
  }
+ showNote('Tören başladı · Mehter sahnede, davetliler oturma alanında');
 }
-function switchTrack(i){trackIndex=(i+5)%5;$('track').value=String(trackIndex);noteIndex=0;if(audio)nextNote=audio.currentTime+.04;showNote('Müzik: '+$('track').selectedOptions[0].text)}
-function showNote(message){$('gameNote').textContent=message}
-function joinGuest(name){
- const username=String(name||'').trim().slice(0,22);
- if(!username)return false;
- if(roster.has(username)){showNote(username+' zaten alayda');return false}
- if(roster.size>=MAX_GUESTS){showNote('Alay doldu (90 kişi)');return false}
- if(phase==='march'){showNote('Alay yürüyüşte; yeni katılım sonraki turda');return false}
- const index=roster.size,base=index%6===5?templates.mehter:index%2===0?templates.male:templates.female;
- if(!base){showNote('Karakter modeli henüz yüklenmedi');return false}
- const clone=base.clone(true);clone.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
- const lane=index%2===0?-1:1,row=Math.floor(index/2);
- clone.position.set(lane*(.55+(row%3)*.12),base.position.y,5.8+row*.48);
- clone.rotation.y=Math.PI;clone.userData.name=username;scene.add(clone);procession.push(clone);
- roster.set(username,clone);$('count').textContent=roster.size+'/90 kişi';showNote(username+' alaya katıldı');return true;
-}
-function beginCountdown(){if(phase==='countdown'||phase==='march')return;phase='countdown';remaining=30;startedAt=performance.now();$('start').disabled=true;showNote('30 saniyelik katılım başladı');}
-function beginMarch(){phase='march';marchStart=performance.now();marchBase=new Map(procession.map(p=>[p,p.position.clone()]));$('phase').textContent='Düğün alayı yürüyor';$('timer').textContent='YÜRÜYÜŞ';$('join').disabled=true;showNote(roster.size+' davetliyle yürüyüş başladı · Hediyeler müziği değiştirir');}
-function receiveGift(giftName){switchTrack(trackIndex+1);showNote('🎁 '+String(giftName||'Hediye')+' geldi · Müzik değişti');}
-window.weddingLive={join:joinGuest,gift:receiveGift,start:beginCountdown};
-$('join').onclick=()=>{if(joinGuest($('guestName').value))$('guestName').value=''};
+window.weddingLive={join:joinGuest,gift:receiveGift,changeRole,start:beginMarch};
+$('join').onclick=()=>{if(joinGuest($('guestName').value,roles[roster.size%3]))$('guestName').value=''};
 $('guestName').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
-$('start').onclick=beginCountdown;
-$('gift').onclick=()=>receiveGift('Test hediyesi');
+$('start').textContent='Yürüyüşü başlat';$('start').onclick=beginMarch;
+$('gift').onclick=()=>{const name=$('guestName').value.trim();if(name&&roster.has(name)){const role=roles[(roles.indexOf(roster.get(name).userData.role)+1)%3];receiveGift(name,role)}else receiveGift('Test hediyesi','music')};
 $('track').onchange=e=>switchTrack(Number(e.target.value));
-$('music').onclick=async()=>{
- if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();
- await audio.resume();musicOn=!musicOn;nextNote=audio.currentTime+.04;
- $('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç';
-};
-beginCountdown();
+$('music').onclick=async()=>{musicOn=!musicOn;if(musicOn){if(!audioPlayer.src)switchTrack(trackIndex);try{await audioPlayer.play()}catch(e){showNote('Gerçek telifsiz MP3 dosyaları henüz yüklenmedi');musicOn=false}}else audioPlayer.pause();$('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç'};
+$('gameNote').textContent='30 saniye katılım · Yürürken de katılabilirsiniz · Gerçek MP3 bekleniyor';
+royal.forEach((p,i)=>{p.position.set(i===0?-.3:.3,0,entryZ-1);p.rotation.y=Math.PI});
 const clock=new THREE.Clock();
 function animate(){
- requestAnimationFrame(animate);const t=clock.getElapsedTime();
+ requestAnimationFrame(animate);const now=performance.now(),dt=Math.min(.05,(now-previousFrame)/1000);previousFrame=now;
+ const t=clock.getElapsedTime();
  if(phase==='countdown'){
-  remaining=Math.max(0,30-Math.floor((performance.now()-startedAt)/1000));
+  const remaining=Math.max(0,30-Math.floor((now-startedAt)/1000));
   $('timer').textContent='00:'+String(remaining).padStart(2,'0');
-  $('phase').textContent='Alay kuruluyor';$('progress').style.width=(remaining/30*100)+'%';
-  if(remaining===0)beginMarch();
+  $('progress').style.width=(remaining/30*100)+'%';
+  if(!remaining)beginMarch();
  }
  if(phase==='march'){
-  const distance=Math.min(13,(performance.now()-marchStart)/1000*.29);
-  for(const p of procession){const origin=marchBase.get(p);if(!origin)continue;p.position.z=origin.z-distance;p.position.y=origin.y+Math.sin(t*8+origin.z)*.013;}
-  if(distance>=13){phase='finished';$('phase').textContent='Alay tamamlandı';$('timer').textContent='BİTTİ';showNote('Yeni tur için sayfayı yenileyin');}
- }else{for(const p of procession)p.rotation.y=Math.PI+Math.sin(t*.4+p.position.z)*.015}
- scheduleMusic();controls.update();renderer.render(scene,camera);
+  const delta=walkSpeed*dt;walkDistance+=delta;
+  for(const p of procession){p.position.z-=delta;p.rotation.y=Math.PI;p.position.y=Math.sin(t*5+p.position.z)*.008}
+  if(royal[0]&&royal[0].position.z<=stageZ+1.5)seatEveryone();
+ }
+ controls.update();renderer.render(scene,camera);
 }
 animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
 </script></body></html>
