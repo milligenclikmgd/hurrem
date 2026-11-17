@@ -11,17 +11,19 @@ function cylinder(parent,material,top,bottom,h,x,y,z){return part(new THREE.Cyli
 function cube(parent,material,w,h,d,x,y,z){return part(new THREE.BoxGeometry(w,h,d),material,parent,x,y,z)}
 const ground=part(new THREE.CylinderGeometry(2.7,2.8,.18,64),m('#d7c3a8'),scene,0,-.1,0);
 const hero=new THREE.Group();scene.add(hero);
-for(let side of [-1,1]){cube(hero,boot,.34,.52,.46,side*.27,.28,.02);ball(hero,boot,side*.27,.08,.19,.23,.12,.31)}
-cylinder(hero,red,.52,.78,1.58,0,1.42,0);cylinder(hero,darkRed,.58,.6,.1,0,1.45,0);
-for(let side of [-1,1]){cube(hero,cream,.23,1.45,.075,side*.47,1.48,.56);for(let j=0;j<5;j++){ball(hero,gold,side*.47,1.02+j*.23,.62,.075,.07,.025)};ball(hero,gold,side*.48,2.12,.55,.095,.095,.05)}
-cube(hero,gold,1.25,.13,.8,0,1.49,0);ball(hero,gold,0,1.5,.45,.23,.23,.08);ball(hero,red,0,1.5,.52,.105,.105,.04);
-const arms=[];for(let side of [-1,1]){let pivot=new THREE.Group();pivot.position.set(side*.65,2.18,0);hero.add(pivot);ball(pivot,red,side*.1,-.38,0,.29,.56,.3);ball(pivot,skin,side*.13,-.86,.04,.19,.2,.19);cylinder(pivot,gold,.31,.31,.08,side*.1,-.71,0);arms.push(pivot)}
-ball(hero,skin,0,3.04,0,.73,.75,.65);for(let side of [-1,1]){ball(hero,skin,side*.65,3.01,0,.15,.22,.16);ball(hero,eyes,side*.25,3.1,.605,.088,.12,.045);ball(hero,cream,side*.22,3.15,.649,.03,.036,.012);ball(hero,brown,side*.25,3.29,.53,.18,.055,.045);ball(hero,blush,side*.48,2.92,.54,.17,.085,.03)}
-ball(hero,blush,0,2.99,.61,.115,.135,.13);
-ball(hero,brown,0,2.68,.32,.49,.32,.39);ball(hero,brown,-.22,2.85,.54,.3,.115,.15);ball(hero,brown,.22,2.85,.54,.3,.115,.15);ball(hero,skin,0,2.85,.66,.115,.045,.02);
-cylinder(hero,cream,.64,.64,.19,0,3.65,0);for(let i=0;i<7;i++){let a=i*Math.PI*2/7;ball(hero,cream,Math.sin(a)*.28,3.78,Math.cos(a)*.25,.44,.2,.38)}ball(hero,cream,0,3.82,0,.76,.3,.68);ball(hero,gold,0,3.77,.56,.16,.17,.05);ball(hero,red,0,3.79,.61,.085,.1,.04);
-const plume=part(new THREE.ConeGeometry(.17,.55,18),gold,hero,0,4.25,.12);plume.rotation.z=-.13;
-ball(hero,brown,0,2.27,-.12,.69,.19,.46);
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();hero.position.y=Math.sin(t*1.5)*.035;hero.rotation.y=Math.sin(t*.45)*.24;arms[0].rotation.x=Math.sin(t*1.5)*.035;arms[1].rotation.x=-Math.sin(t*1.5)*.035;renderer.render(scene,camera)}animate();
+const loading=document.createElement('div');loading.textContent='Kanuni 3D modeli yükleniyor…';loading.style.cssText='position:absolute;left:0;right:0;top:48%;text-align:center;color:#654438;font:14px system-ui';host.appendChild(loading);
+try {
+ const {GLTFLoader}=await import('https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js');
+ const gltf=await new GLTFLoader().loadAsync('./kanuni_suleyman_minimal.glb');
+ const model=gltf.scene;hero.add(model);
+ const bounds=new THREE.Box3().setFromObject(model);
+ const center=bounds.getCenter(new THREE.Vector3());
+ const size=bounds.getSize(new THREE.Vector3());
+ model.position.set(-center.x,-bounds.min.y,-center.z);
+ const scale=4.15/Math.max(size.y,.001);model.scale.setScalar(scale);
+ model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+ loading.remove();
+} catch(e){loading.textContent='Model yüklenemedi. Dosya yolunu kontrol edin.';console.error(e)}
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();hero.position.y=Math.sin(t*1.5)*.035;hero.rotation.y=Math.sin(t*.45)*.24;renderer.render(scene,camera)}animate();
 addEventListener('resize',()=>{const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)});
 </script></body></html>
