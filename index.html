@@ -17,6 +17,7 @@ for(const p of people){if(['Erkek davetli','Kadın davetli','Mehteran'].includes
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
 const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.055;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
+const royalOwners={hurrem:null,kanuni:null},royalExpiry={hurrem:0,kanuni:0};const normalRoles=new Map();
 let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0,seatStartedAt=0;const moving=new Map();let toastTimeout;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
 const tracks=['ilk30saniye.mp3','yurume1.mp3','yurume2.mp3'];
@@ -39,7 +40,7 @@ function makeNameLabel(name){
  sprite.scale.set(.72,.18,1);sprite.position.set(0,.67,0);return sprite;
 }
 function cloneRole(role,name){
- const base=templates[role];if(!base)return null;
+ const base=role==='hurrem'?royal.find(p=>p.userData.name==='Hürrem'):role==='kanuni'?royal.find(p=>p.userData.name==='Kanuni'):templates[role];if(!base)return null;
  const obj=base.clone(true);obj.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
  obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=0;const tag=document.createElement('div');tag.className='nameTag';tag.textContent='@'+name;document.getElementById('nameLayer').appendChild(tag);obj.userData.nameTag=tag;
  scene.add(obj);return obj;
@@ -61,25 +62,47 @@ function joinGuest(name,role='male'){
  if(roster.has(username))return role===roster.get(username).userData.role?true:changeRole(username,role);
  if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
  if(phase==='idle'||phase==='finished'){showNote('Önce 30 saniyelik sayacı başlatın');return false}
- if(!roles.includes(role))role='male';
+ if(![...roles,'hurrem','kanuni'].includes(role))role='male';
  const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
  obj.position.set(point.x,0,entryZ+2.8-walkDistance);obj.userData.slot=index;
- roster.set(username,obj);procession.push(obj);repositionQueue();toastJoin(username);
+ roster.set(username,obj);procession.push(obj);if(roles.includes(role))normalRoles.set(username,role);repositionQueue();toastJoin(username);
  $('count').textContent=roster.size+'/90 kişi';showNote(username+' alaya katıldı · '+roleNames[role]);return true;
 }
 function changeRole(username,role){
- const old=roster.get(username);if(!old||!roles.includes(role))return false;
+ const old=roster.get(username);if(!old||![...roles,'hurrem','kanuni'].includes(role))return false;
  if(old.userData.role===role)return true;
  const replacement=cloneRole(role,username);if(!replacement)return false;
  replacement.position.copy(old.position);replacement.rotation.copy(old.rotation);replacement.userData.slot=old.userData.slot;replacement.userData.queueTarget=old.userData.queueTarget;if(old.userData.nameTag)old.userData.nameTag.remove();
  const index=procession.indexOf(old);if(index>=0)procession[index]=replacement;
- roster.set(username,replacement);scene.remove(old);repositionQueue();showNote(username+' artık '+roleNames[role]);return true;
+ roster.set(username,replacement);scene.remove(old);if(roles.includes(role))normalRoles.set(username,role);repositionQueue();showNote(username+' artık '+roleNames[role]);return true;
 }
-function receiveGift(name,gift='music'){
- // Hediye haritası LIVE sağlayıcısının gerçek hediye ID'leriyle sonradan bağlanabilir.
+function awardRoyal(name,role){
+ const username=String(name||'').trim().replace(/^@/,'').slice(0,24);
+ if(!username||phase==='idle'||phase==='finished')return false;
+ // Bir tahtta aynı anda tek kullanıcı bulunur. Yeni hediye eski saltanatı bitirir.
+ const prior=royalOwners[role];
+ if(prior&&prior!==username)changeRole(prior,normalRoles.get(prior)||'male');
+ for(const other of ['hurrem','kanuni'])if(other!==role&&royalOwners[other]===username)royalOwners[other]=null;
+ if(!roster.has(username))joinGuest(username,'male');
+ if(!changeRole(username,role))return false;
+ royalOwners[role]=username;royalExpiry[role]=performance.now()+60000;
+ const p=roster.get(username),original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));
+ if(original){original.visible=false;moveTo(p,original.position.clone(),5);}
+ toastJoin(username+' · '+(role==='hurrem'?'Hürrem Sultan':'Kanuni Sultan Süleyman')+' (60 sn)');
+ showNote('@'+username+' 60 saniyeliğine '+(role==='hurrem'?'Hürrem Sultan':'Kanuni')+' oldu');
+ return true;
+}
+function receiveGift(name,gift='female'){
  const action=String(gift).toLowerCase();
- if(['male','female','mehter'].includes(action))return joinGuest(name,action);
- switchTrack(trackIndex+1);showNote('🎁 '+String(name||'İzleyici')+' · müzik değişti');return true;
+ if(action==='hurrem'||action==='kanuni')return awardRoyal(name,action);
+ if(roles.includes(action)){
+  const username=String(name||'').trim().replace(/^@/,'');
+  for(const role of ['hurrem','kanuni'])if(royalOwners[role]===username){
+   royalOwners[role]=null;const original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));if(original)original.visible=true;
+  }
+  return joinGuest(username,action);
+ }
+ return false;
 }
 function beginMarch(){
  if(phase==='march'||phase==='finished')return;
@@ -115,19 +138,22 @@ function beginCountdown(){
  $('phase').textContent='Alay kuruluyor';$('start').disabled=true;
  switchTrack(0);showNote('30 saniyelik katılım başladı · Hediyelerle otomatik katılım açık');
 }
-const giftMap={
- 'rose':'male','gül':'male','1':'male',
- 'heart':'female','kalp':'female','2':'female',
- 'perfume':'mehter','parfüm':'mehter','3':'mehter',
- 'music':'music','müzik':'music','4':'music'
+// Hediye isimleri geçicidir: gerçek TikTok kataloğundan ID'ler doğrulanınca güncellenir.
+const giftRules={
+ 'rose':'female','gül':'female',
+ 'tiktok':'male',
+ '3-jeton':'mehter',
+ '10-hurrem':'hurrem','10-kanuni':'kanuni'
 };
 function liveGiftEvent(data){
  const name=String(data?.uniqueId||data?.user?.uniqueId||data?.username||'').replace(/^@/,'');
- const gift=String(data?.giftId??data?.giftName??'').toLocaleLowerCase('tr-TR');
- const action=giftMap[gift]||giftMap[String(data?.giftName||'').toLocaleLowerCase('tr-TR')];
+ const gift=String(data?.giftName||'').toLocaleLowerCase('tr-TR');
+ const giftId=String(data?.giftId??'');
+ const action=giftRules[giftId]||giftRules[gift];
  if(!name||!action)return false;
  return receiveGift(name,action);
 }
+window.weddingGiftRules=giftRules;
 window.weddingLive={join:joinGuest,gift:receiveGift,onGift:liveGiftEvent,changeRole,start:beginCountdown,beginMarch};
 window.addEventListener('wedding-live-gift',e=>liveGiftEvent(e.detail));
 
@@ -154,6 +180,7 @@ function animate(){
   for(const p of royal){p.position.z-=delta;p.rotation.y=Math.PI;p.position.y=Math.sin(t*3+p.position.z)*.003}for(const p of roster.values()){if(p.userData.queueTarget)p.userData.queueTarget.z-=delta;}
   if(royal[0]&&royal[0].position.z<=stageZ)seatEveryone();
  }
+ for(const role of ['hurrem','kanuni']){if(royalOwners[role]&&now>=royalExpiry[role]){const username=royalOwners[role];royalOwners[role]=null;const original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));if(original)original.visible=true;changeRole(username,normalRoles.get(username)||'male');showNote('@'+username+' için 60 saniyelik saltanat sona erdi');}}
  for(const p of roster.values()){
   if((phase==='march'||phase==='countdown')&&p.userData.queueTarget&&!moving.has(p)){
    const d=p.userData.queueTarget.clone().sub(p.position);const step=Math.min(1,dt*.42);
