@@ -6,6 +6,39 @@ const host=document.querySelector('#scene'),status=document.querySelector('#stat
 const loader=new GLTFLoader();const models=[['Meydan','osmanli_dugun_meydani_v2.glb',null],['Kanuni','orta_detay_padisah_karakter_v2.glb',[-.33,0,2.7]],['Hürrem','orta_detay_sultan_karakter.glb',[.33,0,2.7]],['Erkek davetli','orta_detay_osmanli_adam_karakter_v2.glb',[-1.5,0,4.1]],['Kadın davetli','orta_detay_osmanli_kadin_karakter.glb',[1.5,0,4.1]],['Mehteran','mehter_karakter_revize.glb',[-1.8,0,4.7]]];let loaded=0,failed=[];const people=[];let courtyard=null;
 async function addModel([label,file,pos]){try{const gltf=await loader.loadAsync('./'+file);const root=gltf.scene;scene.add(root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root);const size=bounds.getSize(new THREE.Vector3());const center=bounds.getCenter(new THREE.Vector3());const scale=pos?((label==='Kanuni'||label==='Hürrem')?0.43:0.37)/Math.max(size.y,.001):23/Math.max(size.x,size.z,.001);root.scale.setScalar(scale);root.position.set((pos?.[0]||0)-center.x*scale,(pos?.[1]||0)-bounds.min.y*scale,(pos?.[2]||0)-center.z*scale);root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});if(pos){root.userData.name=label;root.rotation.y=Math.PI;root.position.y=2.03;root.userData.standY=2.03;root.userData.standPosition=root.position.clone();people.push(root)}else {courtyard=root;root.traverse(o=>{if(o.name&&/Wedding_Floral_Arch/i.test(o.name))o.visible=false;if(o.isMesh&&/Wedding_Carpet_Runner_Long/i.test(o.name)){const mats=Array.isArray(o.material)?o.material:[o.material];o.material=mats.map(m=>{const c=m.clone();if(c.color)c.color.set('#a83d49');return c});if(o.material.length===1)o.material=o.material[0];}});}loaded++;}catch(e){failed.push(label);console.error(label,e)}status.classList.toggle('ready',loaded===6&&failed.length===0);status.innerHTML='<b>'+loaded+'/6 model yüklendi</b>'+ (failed.length?'<div>Eksik dosyalar: '+failed.join(', ')+'</div>':'<div>Daha uzun düğün yolu ve dengeli renkler hazır.</div>')+(failed.length?'<div>GLB dosyalarını GitHub deposunun ana dizinine yükleyin.</div>':'');}
 await Promise.all(models.map(addModel));
-if(courtyard){courtyard.updateMatrixWorld(true);const meshes=[];courtyard.traverse(o=>{if(o.isMesh&&!/Sky|Cloud|Dome|Roof|Wall|Canopy/i.test(o.name))meshes.push(o)});const ray=new THREE.Raycaster();for(const p of people){ray.set(new THREE.Vector3(p.position.x,3.1,p.position.z),new THREE.Vector3(0,-1,0));const hits=ray.intersectObjects(meshes,false);const floor=hits.find(h=>h.point.y>=1.9&&h.point.y<=2.6&&h.face&&h.face.normal.y>.45);if(floor)p.position.y=floor.point.y;}}
+if(courtyard){courtyard.updateMatrixWorld(true);
+ // Tek parça gibi görünen, mevcut halının önüne uzanan tören yolu.
+ const carpetParts=[];courtyard.traverse(o=>{if(o.isMesh&&/Wedding_Carpet_Runner_Long/i.test(o.name))carpetParts.push(o)});
+ if(carpetParts.length){
+  const bb=new THREE.Box3();for(const o of carpetParts)bb.expandByObject(o);
+  const sx=bb.max.x-bb.min.x,sz=bb.max.z-bb.min.z;
+  const alongZ=sz>=sx, length=alongZ?sz:sx, width=alongZ?sx:sz;
+  const extension=length*1.55;
+  const cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
+  const axisSign=1; // yürüyüş yolu, saray girişinden seyirciye doğru
+  const centerAlong=(alongZ?cz:cx)+axisSign*(length/2+extension/2-.09);
+  const stone=new THREE.MeshStandardMaterial({color:'#c4b6a4',roughness:1});
+  const rug=new THREE.MeshStandardMaterial({color:'#a53b48',roughness:.96});
+  const gold=new THREE.MeshStandardMaterial({color:'#c4a46c',roughness:.82});
+  const accent=new THREE.MeshStandardMaterial({color:'#8b2f3d',roughness:.96});
+  function roadPart(name,across,thickness,long,acrossOffset,alongOffset,y,mat){
+   const mesh=new THREE.Mesh(new THREE.BoxGeometry(alongZ?across:long,thickness,alongZ?long:across),mat);
+   mesh.name=name;mesh.position.set(alongZ?cx+acrossOffset:centerAlong+alongOffset,y,alongZ?centerAlong+alongOffset:cz+acrossOffset);
+   mesh.receiveShadow=true;courtyard.add(mesh);return mesh;
+  }
+  const carpetY=bb.max.y;
+  roadPart('CustomRoad_StoneBase',width+2.5,.09,extension+.2,0,0,carpetY-.095,stone);
+  roadPart('CustomRoad_BurgundyCarpet',width,.035,extension+.08,0,0,carpetY-.027,rug);
+  for(const side of [-1,1]){
+   roadPart('CustomRoad_GoldEdge',.045,.045,extension+.08,side*(width/2-.045),0,carpetY+.003,gold);
+   roadPart('CustomRoad_InnerStripe',.018,.042,extension+.08,side*(width/2-.18),0,carpetY+.002,accent);
+  }
+  // İnce ve aralıklı dekoratif altın çizgiler; yürüyüşü engellemez.
+  for(let i=1;i<9;i++){
+   const offset=-extension/2+i*extension/9;
+   for(const side of [-1,1])roadPart('CustomRoad_GoldInlay',.12,.046,.035,side*(width/2-.13),offset,carpetY+.005,gold);
+  }
+ }
+const meshes=[];courtyard.traverse(o=>{if(o.isMesh&&!/Sky|Cloud|Dome|Roof|Wall|Canopy/i.test(o.name))meshes.push(o)});const ray=new THREE.Raycaster();for(const p of people){ray.set(new THREE.Vector3(p.position.x,3.1,p.position.z),new THREE.Vector3(0,-1,0));const hits=ray.intersectObjects(meshes,false);const floor=hits.find(h=>h.point.y>=1.9&&h.point.y<=2.6&&h.face&&h.face.normal.y>.45);if(floor)p.position.y=floor.point.y;}}
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();for(let i=0;i<people.length;i++){people[i].rotation.y=Math.PI+Math.sin(t*.4+i)*.04;people[i].position.y+=Math.sin(t*2+i)*.00005}controls.update();renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
 </script></body></html>
