@@ -4,8 +4,8 @@ const host=document.querySelector('#scene'),scene=new THREE.Scene();scene.backgr
 const camera=new THREE.PerspectiveCamera(34,9/16,.1,100);camera.position.set(5,4.2,12.8);camera.lookAt(0,1.75,0);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(host.clientWidth,host.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight('#ffffff','#b59b85',2.6));const light=new THREE.DirectionalLight('#fff5e6',3.2);light.position.set(-4,9,7);light.castShadow=true;light.shadow.mapSize.set(1024,1024);light.shadow.camera.left=-8;light.shadow.camera.right=8;light.shadow.camera.top=8;light.shadow.camera.bottom=-8;scene.add(light);
-function m(c){return new THREE.MeshStandardMaterial({color:c,roughness:.86})}const red=m('#9d3042'),darkRed=m('#7b2838'),gold=m('#dfb967'),skin=m('#e8b48c'),cream=m('#f7efe3'),brown=m('#50372d'),boot=m('#3e302c'),eyes=m('#24201d'),blush=m('#d9957e');
-function part(geo,material,parent,x,y,z){const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function m(c){const color=new THREE.Color(c);return new THREE.MeshToonMaterial({color,gradientMap:toonGradient})}const toonData=new Uint8Array([80,150,220,255]);const toonGradient=new THREE.DataTexture(toonData,4,1,THREE.RedFormat);toonGradient.magFilter=THREE.NearestFilter;toonGradient.minFilter=THREE.NearestFilter;toonGradient.needsUpdate=true;const red=m('#9d3042'),darkRed=m('#7b2838'),gold=m('#dfb967'),skin=m('#e8b48c'),cream=m('#f7efe3'),brown=m('#50372d'),boot=m('#3e302c'),eyes=m('#24201d'),blush=m('#d9957e');
+function part(geo,material,parent,x,y,z){const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);if(parent!==scene){const outline=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:'#49332e',side:THREE.BackSide}));outline.scale.setScalar(1.045);o.add(outline)}return o}
 function ball(parent,material,x,y,z,sx,sy,sz){const o=part(new THREE.SphereGeometry(1,24,16),material,parent,x,y,z);o.scale.set(sx,sy,sz);return o}
 function cylinder(parent,material,top,bottom,h,x,y,z){return part(new THREE.CylinderGeometry(top,bottom,h,32),material,parent,x,y,z)}
 function cube(parent,material,w,h,d,x,y,z){return part(new THREE.BoxGeometry(w,h,d),material,parent,x,y,z)}
@@ -16,12 +16,12 @@ cylinder(hero,red,.56,.83,1.75,0,1.42,0);cylinder(hero,darkRed,.58,.6,.1,0,1.45,
 for(let side of [-1,1]){cube(hero,gold,.075,1.46,.04,side*.49,1.48,.56);ball(hero,gold,side*.48,2.12,.55,.095,.095,.05)}
 cube(hero,gold,1.25,.13,.8,0,1.49,0);ball(hero,gold,0,1.5,.45,.23,.23,.08);ball(hero,red,0,1.5,.52,.105,.105,.04);
 const arms=[];for(let side of [-1,1]){let pivot=new THREE.Group();pivot.position.set(side*.65,2.18,0);hero.add(pivot);ball(pivot,red,side*.1,-.38,0,.29,.56,.3);ball(pivot,skin,side*.13,-.86,.04,.19,.2,.19);cylinder(pivot,gold,.31,.31,.08,side*.1,-.71,0);arms.push(pivot)}
-ball(hero,skin,0,3.04,0,.67,.71,.6);for(let side of [-1,1]){ball(hero,skin,side*.65,3.01,0,.15,.22,.16);ball(hero,eyes,side*.25,3.1,.56,.062,.087,.04);ball(hero,cream,side*.23,3.13,.595,.018,.023,.01);ball(hero,brown,side*.25,3.29,.53,.18,.055,.045);ball(hero,blush,side*.45,2.9,.48,.13,.06,.025)}
+ball(hero,skin,0,3.04,0,.73,.75,.65);for(let side of [-1,1]){ball(hero,skin,side*.65,3.01,0,.15,.22,.16);ball(hero,eyes,side*.25,3.1,.605,.088,.12,.045);ball(hero,cream,side*.22,3.15,.649,.03,.036,.012);ball(hero,brown,side*.25,3.29,.53,.18,.055,.045);ball(hero,blush,side*.48,2.92,.54,.17,.085,.03)}
 ball(hero,skin,0,2.99,.59,.12,.14,.13);
-ball(hero,brown,0,2.67,.28,.47,.34,.4);ball(hero,brown,-.18,2.83,.53,.25,.13,.16);ball(hero,brown,.18,2.83,.53,.25,.13,.16);ball(hero,skin,0,2.84,.65,.12,.045,.02);
-cylinder(hero,cream,.64,.64,.19,0,3.65,0);for(let i=0;i<7;i++){let a=i*Math.PI*2/7;ball(hero,cream,Math.sin(a)*.28,3.78,Math.cos(a)*.25,.44,.2,.38)}ball(hero,cream,0,3.82,0,.63,.25,.58);ball(hero,gold,0,3.77,.56,.16,.17,.05);ball(hero,red,0,3.79,.61,.085,.1,.04);
+ball(hero,brown,0,2.68,.32,.46,.32,.38);ball(hero,brown,-.18,2.83,.53,.25,.13,.16);ball(hero,brown,.18,2.83,.53,.25,.13,.16);ball(hero,skin,0,2.84,.65,.12,.045,.02);
+cylinder(hero,cream,.64,.64,.19,0,3.65,0);for(let i=0;i<7;i++){let a=i*Math.PI*2/7;ball(hero,cream,Math.sin(a)*.28,3.78,Math.cos(a)*.25,.44,.2,.38)}ball(hero,cream,0,3.82,0,.69,.27,.62);ball(hero,gold,0,3.77,.56,.16,.17,.05);ball(hero,red,0,3.79,.61,.085,.1,.04);
 const plume=part(new THREE.ConeGeometry(.16,.52,18),red,hero,0,4.25,.12);plume.rotation.z=-.13;
 ball(hero,brown,0,2.28,-.15,.72,.16,.48);
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();hero.position.y=Math.sin(t*1.5)*.035;hero.rotation.y=Math.sin(t*.45)*.17;arms[0].rotation.x=Math.sin(t*1.5)*.035;arms[1].rotation.x=-Math.sin(t*1.5)*.035;renderer.render(scene,camera)}animate();
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();hero.position.y=Math.sin(t*1.5)*.035;hero.rotation.y=Math.sin(t*.45)*.24;arms[0].rotation.x=Math.sin(t*1.5)*.035;arms[1].rotation.x=-Math.sin(t*1.5)*.035;renderer.render(scene,camera)}animate();
 addEventListener('resize',()=>{const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)});
 </script></body></html>
