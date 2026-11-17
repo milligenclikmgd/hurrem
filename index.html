@@ -71,6 +71,7 @@ $('music').onclick=async()=>{
  await audio.resume();musicOn=!musicOn;nextNote=audio.currentTime+.04;
  $('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç';
 };
+beginCountdown();
 const clock=new THREE.Clock();
 function animate(){
  requestAnimationFrame(animate);const t=clock.getElapsedTime();
