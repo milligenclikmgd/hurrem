@@ -1,4 +1,4 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none}</style></head><body><main class="phone"><div id="scene"></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none} .game-ui{position:absolute;left:10px;right:10px;bottom:12px;z-index:5;background:#211a25d9;border:1px solid #e9d1a355;border-radius:13px;padding:9px;color:#fff;font-size:11px;backdrop-filter:blur(9px)}.game-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:6px}.game-head strong{font-size:13px;color:#ffe3a2}.game-ui input,.game-ui select{background:#fff;color:#241a21;border:0;border-radius:6px;padding:7px;min-width:0}.game-ui button{background:#a53b48;color:white;border:1px solid #ffffff44;border-radius:7px;padding:7px;cursor:pointer}.game-ui button:disabled{opacity:.45}.game-row{display:flex;gap:5px;margin-top:6px}.game-row input{flex:1;width:70px}.game-row select{flex:1}.game-row button{white-space:nowrap}.game-progress{height:5px;background:#ffffff33;border-radius:8px;overflow:hidden}.game-progress span{display:block;height:100%;width:100%;background:#e9bd73}.game-note{margin-top:6px;color:#f3ddbb;font-size:10px}.live-hint{bottom:auto;top:9%}.status{bottom:170px}</style></head><body><main class="phone"><div id="scene"></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><section class="game-ui" aria-label="Düğün alayı kontrol paneli"><div class="game-head"><strong id="phase">Alay hazırlanıyor</strong><span id="timer">00:30</span><span id="count">0/90 kişi</span></div><div class="game-progress"><span id="progress"></span></div><div class="game-row"><input id="guestName" maxlength="22" placeholder="Katılımcı adı"><button id="join">Alaya katıl</button><button id="start">30 sn başlat</button></div><div class="game-row"><select id="track" aria-label="Müzik seçimi"><option value="0">1 · Mehter yürüyüşü</option><option value="1">2 · Saray düğünü</option><option value="2">3 · Davul zurna</option><option value="3">4 · Zafer alayı</option><option value="4">5 · Şenlik havası</option></select><button id="music">▶ Müzik aç</button><button id="gift">🎁 Hediye testi</button></div><div class="game-note" id="gameNote">Test modu · TikTok LIVE bağlantısı henüz yok</div></section><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
 import * as THREE from 'https://esm.sh/three@0.170.0';
 import {GLTFLoader} from 'https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js';
@@ -9,5 +9,83 @@ await Promise.all(models.map(addModel));
 if(courtyard){courtyard.updateMatrixWorld(true);
  // V3 meydanı kendi özgün geometrisiyle kullanılır; kodla uzatma yapılmaz.
  const meshes=[];courtyard.traverse(o=>{if(o.isMesh&&!/Sky|Cloud|Dome|Roof|Wall|Canopy/i.test(o.name))meshes.push(o)});const ray=new THREE.Raycaster();for(const p of people){ray.set(new THREE.Vector3(p.position.x,4,p.position.z),new THREE.Vector3(0,-1,0));const hits=ray.intersectObjects(meshes,false);const floor=hits.find(h=>h.point.y>=-.15&&h.point.y<=.6&&h.face&&h.face.normal.y>.45);if(floor)p.position.y=floor.point.y;}}
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();for(let i=0;i<people.length;i++){people[i].rotation.y=Math.PI+Math.sin(t*.4+i)*.04;people[i].position.y+=Math.sin(t*2+i)*.00005}controls.update();renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
+
+// Katılım ve yürüyüş: yerel test altyapısı. Gerçek LIVE olayları bağlanınca
+// window.weddingLive.join(username) / .gift(giftName) kullanılabilir.
+const $=id=>document.getElementById(id),MAX_GUESTS=90;
+const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
+const procession=people.filter(p=>p.userData.name==='Kanuni'||p.userData.name==='Hürrem');
+const roster=new Map();let phase='idle',remaining=30,startedAt=0,marchStart=0,marchBase=new Map();
+const melody=[
+ {notes:[196,247,294,330,294,247,220,196],beat:260,style:'mehter'},
+ {notes:[262,330,392,440,392,330,294,262],beat:330,style:'wedding'},
+ {notes:[294,294,440,392,330,294,262,294],beat:210,style:'zurna'},
+ {notes:[220,277,330,440,392,330,277,220],beat:270,style:'mehter'},
+ {notes:[330,392,440,523,440,392,330,294],beat:195,style:'wedding'}
+];
+let audio=null,musicOn=false,trackIndex=0,nextNote=0,noteIndex=0;
+function tone(freq,when,duration,type='triangle',volume=.05){
+ const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);
+ g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(volume,when+.018);
+ g.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ o.connect(g).connect(audio.destination);o.start(when);o.stop(when+duration+.025);
+}
+function scheduleMusic(){
+ if(!musicOn||!audio)return;
+ const song=melody[trackIndex];
+ while(nextNote<audio.currentTime+.14){
+  const n=song.notes[noteIndex%song.notes.length],dur=song.beat/1000;
+  tone(n,nextNote,dur*.83,song.style==='zurna'?'sawtooth':'triangle',song.style==='zurna'?.026:.046);
+  if(song.style==='mehter')tone(n/2,nextNote,dur*.7,'sine',.032);
+  if(noteIndex%2===0)tone(90,nextNote,dur*.14,'sine',.065);
+  noteIndex++;nextNote+=dur;
+ }
+}
+function switchTrack(i){trackIndex=(i+5)%5;$('track').value=String(trackIndex);noteIndex=0;if(audio)nextNote=audio.currentTime+.04;showNote('Müzik: '+$('track').selectedOptions[0].text)}
+function showNote(message){$('gameNote').textContent=message}
+function joinGuest(name){
+ const username=String(name||'').trim().slice(0,22);
+ if(!username)return false;
+ if(roster.has(username)){showNote(username+' zaten alayda');return false}
+ if(roster.size>=MAX_GUESTS){showNote('Alay doldu (90 kişi)');return false}
+ if(phase==='march'){showNote('Alay yürüyüşte; yeni katılım sonraki turda');return false}
+ const index=roster.size,base=index%6===5?templates.mehter:index%2===0?templates.male:templates.female;
+ if(!base){showNote('Karakter modeli henüz yüklenmedi');return false}
+ const clone=base.clone(true);clone.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
+ const lane=index%2===0?-1:1,row=Math.floor(index/2);
+ clone.position.set(lane*(.55+(row%3)*.12),base.position.y,5.8+row*.48);
+ clone.rotation.y=Math.PI;clone.userData.name=username;scene.add(clone);procession.push(clone);
+ roster.set(username,clone);$('count').textContent=roster.size+'/90 kişi';showNote(username+' alaya katıldı');return true;
+}
+function beginCountdown(){if(phase==='countdown'||phase==='march')return;phase='countdown';remaining=30;startedAt=performance.now();$('start').disabled=true;showNote('30 saniyelik katılım başladı');}
+function beginMarch(){phase='march';marchStart=performance.now();marchBase=new Map(procession.map(p=>[p,p.position.clone()]));$('phase').textContent='Düğün alayı yürüyor';$('timer').textContent='YÜRÜYÜŞ';$('join').disabled=true;showNote(roster.size+' davetliyle yürüyüş başladı · Hediyeler müziği değiştirir');}
+function receiveGift(giftName){switchTrack(trackIndex+1);showNote('🎁 '+String(giftName||'Hediye')+' geldi · Müzik değişti');}
+window.weddingLive={join:joinGuest,gift:receiveGift,start:beginCountdown};
+$('join').onclick=()=>{if(joinGuest($('guestName').value))$('guestName').value=''};
+$('guestName').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
+$('start').onclick=beginCountdown;
+$('gift').onclick=()=>receiveGift('Test hediyesi');
+$('track').onchange=e=>switchTrack(Number(e.target.value));
+$('music').onclick=async()=>{
+ if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();
+ await audio.resume();musicOn=!musicOn;nextNote=audio.currentTime+.04;
+ $('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç';
+};
+const clock=new THREE.Clock();
+function animate(){
+ requestAnimationFrame(animate);const t=clock.getElapsedTime();
+ if(phase==='countdown'){
+  remaining=Math.max(0,30-Math.floor((performance.now()-startedAt)/1000));
+  $('timer').textContent='00:'+String(remaining).padStart(2,'0');
+  $('phase').textContent='Alay kuruluyor';$('progress').style.width=(remaining/30*100)+'%';
+  if(remaining===0)beginMarch();
+ }
+ if(phase==='march'){
+  const distance=Math.min(13,(performance.now()-marchStart)/1000*.29);
+  for(const p of procession){const origin=marchBase.get(p);if(!origin)continue;p.position.z=origin.z-distance;p.position.y=origin.y+Math.sin(t*8+origin.z)*.013;}
+  if(distance>=13){phase='finished';$('phase').textContent='Alay tamamlandı';$('timer').textContent='BİTTİ';showNote('Yeni tur için sayfayı yenileyin');}
+ }else{for(const p of procession)p.rotation.y=Math.PI+Math.sin(t*.4+p.position.z)*.015}
+ scheduleMusic();controls.update();renderer.render(scene,camera);
+}
+animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
 </script></body></html>
