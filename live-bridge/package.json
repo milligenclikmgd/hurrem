@@ -1,0 +1,13 @@
+{
+  "name": "hurrem-tiktok-live-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "tiktok-live-connector": "^2.1.0",
+    "ws": "^8.18.0"
+  }
+}
