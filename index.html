@@ -61,7 +61,7 @@ function joinGuest(name,role='male'){
  const username=String(name||'').trim().replace(/^@/,'').slice(0,24);if(!username)return false;
  if(roster.has(username))return role===roster.get(username).userData.role?true:changeRole(username,role);
  if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
- if(phase==='idle'||phase==='finished'){showNote('Önce 30 saniyelik sayacı başlatın');return false}
+ if(phase==='finished'){showNote('Tören tamamlandı; yeni alay için sayfayı yenileyin');return false}
  if(![...roles,'hurrem','kanuni'].includes(role))role='male';
  const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
  obj.position.set(point.x,0,entryZ+2.8-walkDistance);obj.userData.slot=index;
@@ -78,7 +78,7 @@ function changeRole(username,role){
 }
 function awardRoyal(name,role){
  const username=String(name||'').trim().replace(/^@/,'').slice(0,24);
- if(!username||phase==='idle'||phase==='finished')return false;
+ if(!username||phase==='finished')return false;
  // Bir tahtta aynı anda tek kullanıcı bulunur. Yeni hediye eski saltanatı bitirir.
  const prior=royalOwners[role];
  if(prior&&prior!==username)changeRole(prior,normalRoles.get(prior)||'male');
@@ -145,17 +145,48 @@ const giftRules={
  '3-jeton':'mehter',
  '10-hurrem':'hurrem','10-kanuni':'kanuni'
 };
+const giftRulesById={}; // Gerçek hediye ID'leri LIVE'da görüldüğünde eklenebilir.
+const coinRoles={1:null,3:null,10:null}; // Aynı tutarda birden fazla hediye olduğunda isim/ID şarttır.
+function applyGiftConfig(cfg){
+ if(!cfg||typeof cfg!=='object')return;
+ if(cfg.gifts&&typeof cfg.gifts==='object')for(const [name,role] of Object.entries(cfg.gifts)){
+  if(['male','female','mehter','hurrem','kanuni'].includes(role))giftRules[name.toLocaleLowerCase('tr-TR')]=role;
+ }
+ if(cfg.ids&&typeof cfg.ids==='object')for(const [id,role] of Object.entries(cfg.ids)){
+  if(['male','female','mehter','hurrem','kanuni'].includes(role))giftRulesById[id]=role;
+ }
+}
 function liveGiftEvent(data){
  const name=String(data?.uniqueId||data?.user?.uniqueId||data?.username||'').replace(/^@/,'');
  const gift=String(data?.giftName||'').toLocaleLowerCase('tr-TR');
  const giftId=String(data?.giftId??'');
- const action=giftRules[giftId]||giftRules[gift];
+ const action=giftRulesById[giftId]||giftRules[gift];
  if(!name||!action)return false;
  return receiveGift(name,action);
 }
 window.weddingGiftRules=giftRules;
+window.weddingApplyGiftConfig=applyGiftConfig;
 window.weddingLive={join:joinGuest,gift:receiveGift,onGift:liveGiftEvent,changeRole,start:beginCountdown,beginMarch};
 window.addEventListener('wedding-live-gift',e=>liveGiftEvent(e.detail));
+// Yerel TikTok köprüsü: aynı adresten sunulan oyun WebSocket'e bağlanır.
+(function connectLive(){
+ const local=['localhost','127.0.0.1'].includes(location.hostname);
+ if(!local)return;
+ let socket;
+ function open(){
+  socket=new WebSocket('ws://'+location.host+'/live');
+  socket.onopen=()=>showNote('🟢 TikTok bağlantı köprüsü hazır');
+  socket.onmessage=e=>{
+   let data;try{data=JSON.parse(e.data)}catch{return}
+   if(data.type==='config')applyGiftConfig(data.config);
+   if(data.type==='gift')liveGiftEvent(data);
+   if(data.type==='status')showNote(data.message||'TikTok durumu güncellendi');
+  };
+  socket.onclose=()=>{showNote('🟠 Bağlantı koptu; yeniden deneniyor');setTimeout(open,3000)};
+  socket.onerror=()=>{};
+ }
+ open();
+})();
 
 $('join').onclick=()=>{if(joinGuest($('guestName').value,roles[roster.size%3]))$('guestName').value=''};
 $('guestName').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
