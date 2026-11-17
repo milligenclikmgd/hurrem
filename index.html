@@ -13,10 +13,11 @@ if(courtyard){courtyard.updateMatrixWorld(true);
 // TikTok LIVE bağlayıcısına hazır alay sistemi. Ses dosyaları ayrıca lisanslı olarak yüklenmelidir.
 const $=id=>document.getElementById(id),MAX_GUESTS=90,roster=new Map();
 const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
+for(const p of people){if(['Erkek davetli','Kadın davetli','Mehteran'].includes(p.userData.name))p.visible=false;}
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
 const procession=[...royal],entryZ=15.1,stageZ=-3.35,walkSpeed=.24;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
-let phase='countdown',startedAt=performance.now(),marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
+let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
 const tracks=['ilk30saniye.mp3','yurume1.mp3','yurume2.mp3'];
 let musicOn=false;
@@ -27,18 +28,27 @@ function switchTrack(index){
  if(musicOn)audioPlayer.play().catch(()=>showNote('Lisanslı MP3 dosyası music/ klasörüne yüklenmeli'));
  showNote('Çalınan müzik: '+$('track').selectedOptions[0].text);
 }
+function makeNameLabel(name){
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(35,23,32,.83)';ctx.fillRect(4,12,504,96);
+ ctx.font='bold 42px sans-serif';ctx.fillStyle='#ffe5a9';ctx.textAlign='center';
+ ctx.fillText('@'+name,256,76,490);
+ const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:false,transparent:true}));
+ sprite.scale.set(.72,.18,1);sprite.position.set(0,.67,0);return sprite;
+}
 function cloneRole(role,name){
  const base=templates[role];if(!base)return null;
  const obj=base.clone(true);obj.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
- obj.userData.name=name;obj.userData.role=role;obj.rotation.y=Math.PI;
+ obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=Math.PI;const label=makeNameLabel(name);obj.add(label);obj.userData.label=label;
  scene.add(obj);return obj;
 }
 function slot(index){const row=Math.floor(index/2),side=index%2===0?-1:1;return {x:side*(.64+(row%3)*.13),z:entryZ+row*.49}}
 function joinGuest(name,role='male'){
  const username=String(name||'').trim().slice(0,22);if(!username)return false;
- if(roster.has(username))return changeRole(username,role);
+ if(roster.has(username))return role===roster.get(username).userData.role?true:changeRole(username,role);
  if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
- if(phase==='finished'){showNote('Tören başladı; katılım kapandı');return false}
+ if(phase==='idle'||phase==='finished'){showNote('Önce 30 saniyelik sayacı başlatın');return false}
  if(!roles.includes(role))role='male';
  const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
  obj.position.set(point.x,0,point.z-walkDistance);obj.userData.slot=index;
@@ -93,16 +103,36 @@ function seatEveryone(){
  switchTrack(2);
  showNote('Tören başladı · 36 sandalye dolana kadar oturma düzeni; mehter sahnede');
 }
-window.weddingLive={join:joinGuest,gift:receiveGift,changeRole,start:beginMarch};
+function beginCountdown(){
+ if(phase!=='idle')return;phase='countdown';startedAt=performance.now();
+ $('phase').textContent='Alay kuruluyor';$('start').disabled=true;
+ switchTrack(0);showNote('30 saniyelik katılım başladı · Hediyelerle otomatik katılım açık');
+}
+const giftMap={
+ 'rose':'male','gül':'male','1':'male',
+ 'heart':'female','kalp':'female','2':'female',
+ 'perfume':'mehter','parfüm':'mehter','3':'mehter',
+ 'music':'music','müzik':'music','4':'music'
+};
+function liveGiftEvent(data){
+ const name=String(data?.uniqueId||data?.username||data?.userId||'').replace(/^@/,'');
+ const gift=String(data?.giftId??data?.giftName??'').toLocaleLowerCase('tr-TR');
+ const action=giftMap[gift]||giftMap[String(data?.giftName||'').toLocaleLowerCase('tr-TR')];
+ if(!name||!action)return false;
+ return receiveGift(name,action);
+}
+window.weddingLive={join:joinGuest,gift:receiveGift,onGift:liveGiftEvent,changeRole,start:beginCountdown,beginMarch};
+window.addEventListener('wedding-live-gift',e=>liveGiftEvent(e.detail));
+
 $('join').onclick=()=>{if(joinGuest($('guestName').value,roles[roster.size%3]))$('guestName').value=''};
 $('guestName').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
-$('start').textContent='Yürüyüşü başlat';$('start').onclick=beginMarch;
-$('gift').onclick=()=>{const name=$('guestName').value.trim();if(name&&roster.has(name)){const role=roles[(roles.indexOf(roster.get(name).userData.role)+1)%3];receiveGift(name,role)}else receiveGift('Test hediyesi','music')};
+$('start').textContent='30 sn başlat';$('start').onclick=beginCountdown;
+$('gift').onclick=()=>{const name=$('guestName').value.trim();if(name){const role=roster.has(name)?roles[(roles.indexOf(roster.get(name).userData.role)+1)%3]:roles[roster.size%3];receiveGift(name,role)}else showNote('Test için önce kullanıcı adı girin')};
 $('track').onchange=e=>switchTrack(Number(e.target.value));
 $('music').onclick=async()=>{musicOn=!musicOn;if(musicOn){if(!audioPlayer.getAttribute('src'))switchTrack(trackIndex);try{await audioPlayer.play()}catch(e){showNote('Ses için tarayıcı izni veya dosya erişimi gerekli');musicOn=false}}else audioPlayer.pause();$('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç'};
 $('gameNote').textContent='30 saniye katılım · Yürürken de katılabilirsiniz · Gerçek MP3 bekleniyor';
-royal.forEach((p,i)=>{p.position.set(i===0?-.3:.3,0,entryZ-1);p.rotation.y=Math.PI});
-switchTrack(0);const clock=new THREE.Clock();
+royal.forEach((p,i)=>{p.position.set(i===0?-.25:.25,0,entryZ-1);p.rotation.y=Math.PI});
+switchTrack(0);$('phase').textContent='Başlatılmayı bekliyor';$('timer').textContent='00:30';const clock=new THREE.Clock();
 function animate(){
  requestAnimationFrame(animate);const now=performance.now(),dt=Math.min(.05,(now-previousFrame)/1000);previousFrame=now;
  const t=clock.getElapsedTime();
