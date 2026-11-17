@@ -89,7 +89,8 @@ function removeGuest(name,notify=true){
 function awardRoyal(name,role){
  const username=String(name||'').trim().replace(/^@/,'').slice(0,24);if(!username)return false;
  for(const other of ['hurrem','kanuni'])if(other!==role&&royalOwners[other]===username)clearRoyal(other);
- clearRoyal(role);if(roster.has(username))removeGuest(username,false);
+ // Taht ataması yalnız isim etiketini değiştirir; karaktere, konuma, yürüyüşe ve alay sırasına dokunma.
+ clearRoyal(role);
  const tag=document.createElement('div');tag.className='nameTag royalTag';tag.textContent='👑 @'+username;
  document.getElementById('nameLayer').appendChild(tag);royalLabels[role]=tag;royalOwners[role]=username;royalExpiry[role]=performance.now()+60000;
  toastJoin(username+' · '+(role==='hurrem'?'Hürrem Sultan':'Kanuni Sultan Süleyman')+' (60 sn)');
