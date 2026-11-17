@@ -20,7 +20,7 @@ const server=http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://'+HOST+':'+PORT);
  if(u.pathname==='/command'&&req.method==='POST'){
   let raw='';req.on('data',chunk=>{raw+=chunk;if(raw.length>4096)req.destroy()});
-  req.on('end',()=>{try{const cmd=JSON.parse(raw);if(!['join','start','march','music','stopMusic','cameraReset'].includes(cmd.type))throw Error('Geçersiz komut');broadcast({type:'command',command:cmd});res.writeHead(200,{'Content-Type':'application/json'});res.end('{"ok":true}')}catch(e){res.writeHead(400);res.end('Geçersiz istek')}});
+  req.on('end',()=>{try{const cmd=JSON.parse(raw);if(!['join','remove','camera','start','march','music','stopMusic','cameraReset'].includes(cmd.type))throw Error('Geçersiz komut');broadcast({type:'command',command:cmd});res.writeHead(200,{'Content-Type':'application/json'});res.end('{"ok":true}')}catch(e){res.writeHead(400);res.end('Geçersiz istek')}});
   return;
  }
  if(u.pathname==='/health'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify({ok:true,account:config.account,viewers:clients.size}));return;}
