@@ -1,7 +1,7 @@
 <!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem • 3D Saray Düğünü</title><style>*{box-sizing:border-box}body{margin:0;background:#17121b;color:white;font-family:system-ui;display:grid;place-items:center;min-height:100vh}.phone{position:relative;width:min(100vw,430px);height:min(100dvh,764px);aspect-ratio:9/16;overflow:hidden;background:#d6b990}canvas{display:block;width:100%;height:100%}.header{position:absolute;top:2%;width:100%;text-align:center;text-shadow:0 2px 5px #381a18}.header small{background:#672639c9;padding:5px 12px;border-radius:15px}.header h1{font: bold clamp(19px,5vw,27px) Georgia,serif;color:#ffe6b2;margin:12px 0}.demo{position:absolute;right:3%;top:2%;background:#d32d41;border-radius:9px;padding:6px;font-size:11px}.names{position:absolute;top:64%;left:0;right:0;display:flex;justify-content:space-around;pointer-events:none}.names span{background:#44202ddf;border:1px solid #dfb570;padding:5px 8px;border-radius:18px;font-size:11px;font-weight:bold}.status{position:absolute;bottom:15%;left:4%;font-size:12px;text-shadow:0 2px 3px #24121c}.buttons{position:absolute;bottom:1%;left:2%;right:2%;display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.buttons button{color:white;background:#532333ed;border:1px solid #e7bd78;border-radius:9px;padding:10px 2px;font-size:11px;cursor:pointer}.buttons button:active{background:#8b4051}</style></head><body><div class="phone"><div id="scene" style="width:100%;height:100%"></div><div class="header"><small>✦ SARAY DÜĞÜNÜ ✦</small><h1>Hürrem Sultan &amp;<br>Kanuni Sultan Süleyman</h1></div><div class="demo">● 3D DEMO</div><div class="names"><span id="sultan">👑 @suleyman</span><span id="hurrem">👑 @hurrem</span></div><div class="status" id="status">3D sahne hazır • Butonları dene</div><div class="buttons"><button id="guest">🌹 Davetli ekle</button><button id="band">🥁 Mehter ekle</button><button id="court">✨ Erkân ekle</button><button id="king">👑 Süleyman ol</button><button id="queen">👑 Hürrem ol</button><button id="reset">↻ Sıfırla</button></div></div><script type="module">
 import * as THREE from 'https://esm.sh/three@0.170.0';
-const mount=document.getElementById('scene'),scene=new THREE.Scene();scene.background=new THREE.Color('#a8c8d6');scene.fog=new THREE.Fog('#a8c8d6',22,65);
-const camera=new THREE.PerspectiveCamera(39,9/16,.1,120);camera.position.set(9,13,24);camera.lookAt(0,2,-3);
+const mount=document.getElementById('scene'),scene=new THREE.Scene();scene.background=new THREE.Color('#a8c8d6');scene.fog=new THREE.Fog('#a8c8d6',32,90);
+const camera=new THREE.PerspectiveCamera(39,9/16,.1,120);camera.position.set(6.5,8.2,24);camera.lookAt(0,2.6,-3);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(mount.clientWidth,mount.clientHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;mount.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight('#ffffff','#96725e',2.5));const sun=new THREE.DirectionalLight('#fff0d0',3);sun.position.set(-8,18,11);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-22;sun.shadow.camera.right=22;sun.shadow.camera.top=22;sun.shadow.camera.bottom=-22;scene.add(sun);
 function mat(c,metalness=0){return new THREE.MeshStandardMaterial({color:c,roughness:.78,metalness})}
@@ -13,10 +13,46 @@ function cyl(rt,rb,h,m,p,parent){return mesh(new THREE.CylinderGeometry(rt,rb,h,
 box(80,.15,90,stone,[0,-.1,-8]);box(4,.04,70,red,[0,.02,-8]);for(let i=-2;i<=2;i++){box(.07,.05,70,gold,[i*.75,.06,-8])}
 for(let z=-29;z<=5;z+=5){for(let side of [-1,1]){const x=side*5.6;cyl(.55,.7,6,cream,[x,3,z]);cyl(.78,.78,.45,gold,[x,6.15,z]);box(2,.7,1.5,stone,[x,6.7,z]);}}
 box(15,9,2,stone,[0,4,-37]);const dome=sphere(5,mat('#8ca4a4'),[0,10,-37],scene,[1,.55,.75]);box(4,6,.5,mat('#663d3c'),[0,3,-35.9]);
-const characters=[];function person(type,x,z,scale=1){const root=new THREE.Group();scene.add(root);root.position.set(x,0,z);root.scale.setScalar(scale);const female=type==='hurrem',king=type==='sultan',band=type==='Mehteran',court=type==='Saray Erkânı';const cloth=mat(female?'#b43b55':king?'#982d38':band?'#b93c3e':court?'#254c70':'#536a54');cyl(.39,.6,1.7,cloth,[0,1.15,0],root);cyl(.41,.41,.1,gold,[0,1.45,0],root);for(let a of [-1,1]){let arm=sphere(.2,cloth,[a*.55,1.5,0],root,[.8,2.4,.8]);let leg=box(.27,.5,.34,black,[a*.24,.22,.03],root)}sphere(.49,skin,[0,2.55,0],root,[1,.98,.9]);for(let a of [-1,1])sphere(.045,black,[a*.18,2.58,.43],root);if(!female){sphere(.24,black,[0,2.27,.29],root,[1,.48,.65]);cyl(.49,.53,.28,cream,[0,3.02,0],root);sphere(.53,cream,[0,3.12,0],root,[1,.35,1]);if(king){sphere(.14,gold,[0,3.43,0],root);sphere(.09,red,[0,3.49,.11],root)}}else{sphere(.55,mat('#8e4c32'),[0,2.8,-.15],root,[1,1.2,.6]);cyl(.43,.5,.2,gold,[0,3.13,0],root);for(let a of [-1,0,1])sphere(.09,red,[a*.23,3.28,0],root)}if(king||female){for(let a of [-1,1])box(.08,1.4,.05,gold,[a*.32,1.12,.43],root)}if(band){cyl(.38,.38,.2,mat('#cfa66b'),[0,1.3,.48],root).rotation.x=Math.PI/2}characters.push({root,type,seed:Math.random()*10,baseZ:z});return root}
+const characters=[];
+function person(type,x,z,scale=1){
+const root=new THREE.Group();scene.add(root);root.position.set(x,0,z);root.scale.setScalar(scale);
+const female=type==='hurrem',king=type==='sultan',band=type==='Mehteran',court=type==='Saray Erkânı';
+const cloth=mat(female?'#ae3451':king?'#8d2336':band?'#b93237':court?'#244b6a':'#536e59');
+const trim=mat('#e6bd67',.3),fur=mat('#54372b'),hair=mat('#8b4c32'),white=mat('#fff1db'),jewel=mat('#b92939',.25);
+const leftLeg=new THREE.Group(),rightLeg=new THREE.Group();leftLeg.position.set(-.21,.48,0);rightLeg.position.set(.21,.48,0);root.add(leftLeg,rightLeg);
+box(.29,.58,.39,black,[0,-.22,.03],leftLeg);box(.29,.58,.39,black,[0,-.22,.03],rightLeg);
+cyl(.39,.61,1.64,cloth,[0,1.19,0],root);
+for(let a of [-1,1]){box(.075,1.45,.055,trim,[a*.35,1.17,.365],root);sphere(.09,trim,[a*.33,1.87,.32],root)}
+box(.78,.13,.73,trim,[0,1.28,0],root);sphere(.18,trim,[0,1.29,.4],root);sphere(.105,jewel,[0,1.29,.52],root);
+const arms=[];
+for(let a of [-1,1]){const pivot=new THREE.Group();pivot.position.set(a*.48,1.85,0);root.add(pivot);sphere(.23,cloth,[0,-.28,0],pivot,[.9,1.8,.9]);sphere(.16,skin,[0,-.66,.02],pivot);box(.36,.09,.39,trim,[0,-.54,.02],pivot);arms.push(pivot)}
+sphere(.46,skin,[0,2.52,0],root,[1,1.07,.93]);sphere(.12,skin,[-.45,2.49,0],root);sphere(.12,skin,[.45,2.49,0],root);
+for(let a of [-1,1]){sphere(.068,black,[a*.17,2.56,.41],root);sphere(.022,white,[a*.15,2.59,.46],root);box(.16,.04,.04,fur,[a*.17,2.72,.39],root)}
+sphere(.09,skin,[0,2.45,.43],root,[.85,1.2,.65]);
+if(female){
+sphere(.47,hair,[0,2.76,-.12],root,[1,1.17,.72]);
+sphere(.16,hair,[-.34,2.52,-.03],root,[.7,1.9,.7]);sphere(.16,hair,[.34,2.52,-.03],root,[.7,1.9,.7]);
+cyl(.39,.47,.18,trim,[0,3.09,0],root);
+for(let a of [-1,0,1]){sphere(.11,trim,[a*.26,3.23,0],root);sphere(.065,jewel,[a*.26,3.26,.07],root)}
+sphere(.055,jewel,[0,2.32,.4],root,[1.4,.6,.6]);
+}else{
+sphere(.33,fur,[0,2.22,.12],root,[1, .7, .82]);
+sphere(.19,fur,[-.14,2.37,.33],root,[1,.4,.65]);sphere(.19,fur,[.14,2.37,.33],root,[1,.4,.65]);
+cyl(.45,.48,.19,white,[0,2.98,0],root);
+for(let i=0;i<5;i++){let a=i*Math.PI*2/5;sphere(.36,white,[Math.cos(a)*.2,3.12,Math.sin(a)*.2],root,[.85,.48,.85])}
+sphere(.45,white,[0,3.17,0],root,[1,.52,1]);
+if(king){
+sphere(.13,trim,[0,3.44,.3],root);sphere(.09,jewel,[0,3.46,.41],root);
+const feather=mesh(new THREE.ConeGeometry(.2,.7,10),jewel,[0,3.76,.04],root);feather.rotation.z=.17;
+sphere(.42,fur,[0,1.96,-.05],root,[1.55,.27,.9]);
+}}
+if(band){const drum=cyl(.35,.35,.24,mat('#cfa66b'),[0,1.3,.58],root);drum.rotation.x=Math.PI/2;for(let a of [-1,1])box(.04,.55,.04,trim,[a*.16,1.36,.77],root)}
+if(court){sphere(.14,trim,[0,1.9,.42],root)}
+characters.push({root,type,seed:Math.random()*10,baseZ:z,leftLeg,rightLeg,arms});return root
+}
 person('sultan',-1.25,5,1.35);person('hurrem',1.25,5,1.35);for(let i=0;i<16;i++)person(i%5===0?'Mehteran':i%3===0?'Saray Erkânı':'Davetli Halk',(-2.8+(i%4)*1.85),-1-Math.floor(i/4)*3,.85);
 let n=0;function join(type){n++;let col=n%6;person(type,-3.5+col*1.4,-13-Math.floor(n/6)*2.2,.8);document.getElementById('status').textContent='🎉 @misafir'+n+' katıldı: '+type}
 function crown(id){n++;document.getElementById(id).textContent='👑 @misafir'+n;document.getElementById('status').textContent='Yeni '+(id==='sultan'?'Süleyman':'Hürrem')+' seçildi!'}
 document.getElementById('guest').onclick=()=>join('Davetli Halk');document.getElementById('band').onclick=()=>join('Mehteran');document.getElementById('court').onclick=()=>join('Saray Erkânı');document.getElementById('king').onclick=()=>crown('sultan');document.getElementById('queen').onclick=()=>crown('hurrem');document.getElementById('reset').onclick=()=>location.reload();
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);let t=clock.getElapsedTime();for(let c of characters){c.root.position.y=Math.sin(t*3+c.seed)*.035;c.root.rotation.y=Math.sin(t*.7+c.seed)*.035}renderer.render(scene,camera)}animate();window.addEventListener('resize',()=>{let w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)});
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);let t=clock.getElapsedTime();for(let c of characters){c.root.position.y=Math.sin(t*3+c.seed)*.035;c.root.rotation.y=Math.sin(t*.7+c.seed)*.035;c.leftLeg.rotation.x=Math.sin(t*2.8+c.seed)*.16;c.rightLeg.rotation.x=-Math.sin(t*2.8+c.seed)*.16;c.arms[0].rotation.x=-Math.sin(t*2.8+c.seed)*.12;c.arms[1].rotation.x=Math.sin(t*2.8+c.seed)*.12}renderer.render(scene,camera)}animate();window.addEventListener('resize',()=>{let w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)});
 </script></body></html>
