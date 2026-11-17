@@ -7,28 +7,45 @@ const loader=new GLTFLoader();const models=[['Meydan','osmanli_dugun_meydani_v2.
 async function addModel([label,file,pos]){try{const gltf=await loader.loadAsync('./'+file);const root=gltf.scene;scene.add(root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root);const size=bounds.getSize(new THREE.Vector3());const center=bounds.getCenter(new THREE.Vector3());const scale=pos?((label==='Kanuni'||label==='Hürrem')?0.43:0.37)/Math.max(size.y,.001):23/Math.max(size.x,size.z,.001);root.scale.setScalar(scale);root.position.set((pos?.[0]||0)-center.x*scale,(pos?.[1]||0)-bounds.min.y*scale,(pos?.[2]||0)-center.z*scale);root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});if(pos){root.userData.name=label;root.rotation.y=Math.PI;root.position.y=2.03;root.userData.standY=2.03;root.userData.standPosition=root.position.clone();people.push(root)}else {courtyard=root;root.traverse(o=>{if(o.name&&/Wedding_Floral_Arch/i.test(o.name))o.visible=false;if(o.isMesh&&/Wedding_Carpet_Runner_Long/i.test(o.name)){const mats=Array.isArray(o.material)?o.material:[o.material];o.material=mats.map(m=>{const c=m.clone();if(c.color)c.color.set('#a83d49');return c});if(o.material.length===1)o.material=o.material[0];}});}loaded++;}catch(e){failed.push(label);console.error(label,e)}status.classList.toggle('ready',loaded===6&&failed.length===0);status.innerHTML='<b>'+loaded+'/6 model yüklendi</b>'+ (failed.length?'<div>Eksik dosyalar: '+failed.join(', ')+'</div>':'<div>Daha uzun düğün yolu ve dengeli renkler hazır.</div>')+(failed.length?'<div>GLB dosyalarını GitHub deposunun ana dizinine yükleyin.</div>':'');}
 await Promise.all(models.map(addModel));
 if(courtyard){courtyard.updateMatrixWorld(true);
- // Eklenen yapay yol kaldırıldı. Orijinal GLB halısının kendi geometrisi uzatılır.
+ // Meydanı tek parça olarak uzat: cami tarafı sabit, giriş tarafı uzaklaşır.
+ // Halı, taş zemin, duvarlar ve yan dekorlar aynı koordinat dönüşümünü paylaşır.
  const runners=[];courtyard.traverse(o=>{if(o.isMesh&&/Wedding_Carpet_Runner_Long/i.test(o.name))runners.push(o)});
  if(runners.length){
-   const worldBounds=new THREE.Box3();runners.forEach(o=>worldBounds.expandByObject(o));
-   const extent=new THREE.Vector3();worldBounds.getSize(extent);
-   const axis=extent.z>=extent.x?'z':'x';
-   const start=worldBounds.min[axis];
-   const stretch=2.35;
-   for(const mesh of runners){
-     mesh.updateMatrixWorld(true);
-     const toWorld=mesh.matrixWorld.clone(),toLocal=toWorld.clone().invert();
-     const geo=mesh.geometry.clone(),position=geo.getAttribute('position');
-     const vertex=new THREE.Vector3();
-     for(let i=0;i<position.count;i++){
-       vertex.fromBufferAttribute(position,i).applyMatrix4(toWorld);
-       vertex[axis]=start+(vertex[axis]-start)*stretch;
-       vertex.applyMatrix4(toLocal);
-       position.setXYZ(i,vertex.x,vertex.y,vertex.z);
-     }
-     position.needsUpdate=true;geo.computeBoundingBox();geo.computeBoundingSphere();geo.computeVertexNormals();
-     mesh.geometry=geo;
-   }
+  const rb=new THREE.Box3();runners.forEach(o=>rb.expandByObject(o));
+  const dims=rb.getSize(new THREE.Vector3()),axis=dims.z>=dims.x?'z':'x';
+  const fixedEnd=rb.min[axis], originalEnd=rb.max[axis], originalLength=originalEnd-fixedEnd;
+  const stretch=2.1;
+  const warp=v=>fixedEnd+(v-fixedEnd)*stretch;
+  const architecture=/Mosque|Masjid|Minaret|Dome|Palace|Throne|Stage|Sky|Cloud/i;
+  const sceneMeshes=[];courtyard.traverse(o=>{if(o.isMesh)sceneMeshes.push(o)});
+  for(const mesh of sceneMeshes){
+    if(/Sky|Cloud/i.test(mesh.name))continue;
+    mesh.updateMatrixWorld(true);
+    const worldBox=new THREE.Box3().setFromObject(mesh);
+    const center=worldBox.getCenter(new THREE.Vector3());
+    const span=worldBox.max[axis]-worldBox.min[axis];
+    const building=architecture.test(mesh.name);
+    // Cami, taht ve kubbelerin biçimini koru; yalnızca yol ve zemin boyunca
+    // uzanan yüzeyleri esnet. Dekorları kendi boyutlarını koruyarak kaydır.
+    const deform=!building && (span>originalLength*.34 || /Carpet|Ground|Floor|Courtyard|Wall|Fence|Path|Walkway|Pavement|Road/i.test(mesh.name));
+    const geo=mesh.geometry.clone(),pos=geo.getAttribute('position');
+    const world=mesh.matrixWorld.clone(),inverse=world.clone().invert(),p=new THREE.Vector3();
+    const move=warp(center[axis])-center[axis];
+    for(let i=0;i<pos.count;i++){
+      p.fromBufferAttribute(pos,i).applyMatrix4(world);
+      if(deform)p[axis]=warp(p[axis]);
+      else if(!building)p[axis]+=move;
+      p.applyMatrix4(inverse);pos.setXYZ(i,p.x,p.y,p.z);
+    }
+    pos.needsUpdate=true;geo.computeBoundingBox();geo.computeBoundingSphere();
+    if(deform)geo.computeVertexNormals();
+    mesh.geometry=geo;
+  }
+  // Bağımsız GLB karakterlerini de uzayan meydanın yeni koordinatlarına taşı.
+  for(const person of people){
+    person.position[axis]=warp(person.position[axis]);
+    person.userData.standPosition=person.position.clone();
+  }
  }
 const meshes=[];courtyard.traverse(o=>{if(o.isMesh&&!/Sky|Cloud|Dome|Roof|Wall|Canopy/i.test(o.name))meshes.push(o)});const ray=new THREE.Raycaster();for(const p of people){ray.set(new THREE.Vector3(p.position.x,3.1,p.position.z),new THREE.Vector3(0,-1,0));const hits=ray.intersectObjects(meshes,false);const floor=hits.find(h=>h.point.y>=1.9&&h.point.y<=2.6&&h.face&&h.face.normal.y>.45);if(floor)p.position.y=floor.point.y;}}
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();for(let i=0;i<people.length;i++){people[i].rotation.y=Math.PI+Math.sin(t*.4+i)*.04;people[i].position.y+=Math.sin(t*2+i)*.00005}controls.update();renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
