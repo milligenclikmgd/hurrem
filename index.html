@@ -15,7 +15,7 @@ const $=id=>document.getElementById(id),MAX_GUESTS=90,roster=new Map();
 const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
 for(const p of people){if(['Erkek davetli','Kadın davetli','Mehteran'].includes(p.userData.name))p.visible=false;}
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
-const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.24;
+const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.075;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
 let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
@@ -24,15 +24,16 @@ let musicOn=false;
 function showNote(msg){$('gameNote').textContent=msg}
 function switchTrack(index){
  trackIndex=((index%tracks.length)+tracks.length)%tracks.length;$('track').value=String(trackIndex);
- audioPlayer.src='./'+tracks[trackIndex];
- if(musicOn)audioPlayer.play().catch(()=>showNote('Lisanslı MP3 dosyası music/ klasörüne yüklenmeli'));
+ const nextSrc=new URL('./'+tracks[trackIndex],location.href).href;
+ if(audioPlayer.src!==nextSrc){audioPlayer.src=nextSrc;audioPlayer.load();}
+ if(musicOn)audioPlayer.play().catch(()=>showNote('Müziği aç düğmesine basın'));
  showNote('Çalınan müzik: '+$('track').selectedOptions[0].text);
 }
 function makeNameLabel(name){
  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
  const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(35,23,32,.83)';ctx.fillRect(4,12,504,96);
  ctx.font='bold 42px sans-serif';ctx.fillStyle='#ffe5a9';ctx.textAlign='center';
- ctx.fillText('@'+name,256,76,490);
+ ctx.fillText('@'+String(name).replace(/^@/,''),256,76,490);
  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:false,transparent:true}));
  sprite.scale.set(.72,.18,1);sprite.position.set(0,.67,0);return sprite;
@@ -40,12 +41,12 @@ function makeNameLabel(name){
 function cloneRole(role,name){
  const base=templates[role];if(!base)return null;
  const obj=base.clone(true);obj.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
- obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=Math.PI;const label=makeNameLabel(name);obj.add(label);obj.userData.label=label;
+ obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=0;const label=makeNameLabel(name);obj.add(label);obj.userData.label=label;
  scene.add(obj);return obj;
 }
 function slot(index){const row=Math.floor(index/2),side=index%2===0?-1:1;return {x:side*(.64+(row%3)*.13),z:entryZ+row*.49}}
 function joinGuest(name,role='male'){
- const username=String(name||'').trim().slice(0,22);if(!username)return false;
+ const username=String(name||'').trim().replace(/^@/,'').slice(0,24);if(!username)return false;
  if(roster.has(username))return role===roster.get(username).userData.role?true:changeRole(username,role);
  if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
  if(phase==='idle'||phase==='finished'){showNote('Önce 30 saniyelik sayacı başlatın');return false}
@@ -81,8 +82,20 @@ function seatEveryone(){
  // 36 sandalye x=±3.3/4.45/5.6 ve z=-7.8..-2.05,
  // mehter sahnesi x=-10.8,z=-3.5. Meydan ölçeği 0.32.
  const scale=.32;
+ // Sandalye/taht konumlarını modelin dünya koordinatlarından tespit et.
+ const chairs=[];const thrones=[];
+ if(courtyard){courtyard.updateMatrixWorld(true);courtyard.traverse(o=>{
+   if(!o.isMesh)return;const n=(o.name||'').toLowerCase();
+   if(!/chair|seat|sandalye|throne|taht/.test(n))return;
+   const bounds=new THREE.Box3().setFromObject(o);if(bounds.isEmpty())return;
+   const p=bounds.getCenter(new THREE.Vector3());
+   if(/throne|taht/.test(n))thrones.push(p);else chairs.push(p);
+ });}
+ const uniquePositions=(arr)=>arr.filter((p,i)=>arr.findIndex(q=>p.distanceToSquared(q)<.025)===i);
+ const realChairs=uniquePositions(chairs).sort((a,b)=>a.z-b.z||a.x-b.x);
+ const realThrones=uniquePositions(thrones).sort((a,b)=>a.x-b.x);
  royal.forEach((p,i)=>{
-   p.position.set((i===0?-1.15:1.15)*scale,.46*scale+.16,-10.65*scale);
+   const target=realThrones[i];p.position.set(target?target.x:(i===0?-1.15:1.15)*scale,target?target.y+.10:.46*scale+.16,target?target.z:-10.65*scale);
    p.rotation.y=0;p.scale.y*=.73;
  });
  const guests=[...roster.values()].filter(p=>p.userData.role!=='mehter');
@@ -90,7 +103,8 @@ function seatEveryone(){
  const chairX=[-3.3,-4.45,-5.6,3.3,4.45,5.6];
  guests.forEach((p,i)=>{
    const chairRow=Math.floor(i/6),x=chairX[i%6]*scale;
-   if(chairRow<6){
+   if(i<realChairs.length){const c=realChairs[i];p.position.set(c.x,c.y+.08,c.z);p.scale.y*=.75;p.rotation.y=0;
+   }else if(chairRow<6){
      p.position.set(x,.54*scale+.12,(-7.8+chairRow*1.15)*scale);
      p.scale.y*=.75;p.rotation.y=0;
    }else{
@@ -115,7 +129,7 @@ const giftMap={
  'music':'music','müzik':'music','4':'music'
 };
 function liveGiftEvent(data){
- const name=String(data?.uniqueId||data?.username||data?.userId||'').replace(/^@/,'');
+ const name=String(data?.uniqueId||data?.user?.uniqueId||data?.username||'').replace(/^@/,'');
  const gift=String(data?.giftId??data?.giftName??'').toLocaleLowerCase('tr-TR');
  const action=giftMap[gift]||giftMap[String(data?.giftName||'').toLocaleLowerCase('tr-TR')];
  if(!name||!action)return false;
@@ -132,7 +146,7 @@ $('track').onchange=e=>switchTrack(Number(e.target.value));
 $('music').onclick=async()=>{musicOn=!musicOn;if(musicOn){if(!audioPlayer.getAttribute('src'))switchTrack(trackIndex);try{await audioPlayer.play()}catch(e){showNote('Ses için tarayıcı izni veya dosya erişimi gerekli');musicOn=false}}else audioPlayer.pause();$('music').textContent=musicOn?'❚❚ Müziği durdur':'▶ Müzik aç'};
 $('gameNote').textContent='30 saniye katılım · Yürürken de katılabilirsiniz · Gerçek MP3 bekleniyor';
 royal.forEach((p,i)=>{p.visible=true;p.position.set(i===0?-.24:.24,0,entryZ-1);p.rotation.y=Math.PI});
-switchTrack(0);$('phase').textContent='Başlatılmayı bekliyor';$('timer').textContent='00:30';const clock=new THREE.Clock();
+audioPlayer.src='./'+tracks[0];$('phase').textContent='Başlatılmayı bekliyor';$('timer').textContent='00:30';const clock=new THREE.Clock();
 function animate(){
  requestAnimationFrame(animate);const now=performance.now(),dt=Math.min(.05,(now-previousFrame)/1000);previousFrame=now;
  const t=clock.getElapsedTime();
@@ -144,8 +158,8 @@ function animate(){
  }
  if(phase==='march'){
   const delta=walkSpeed*dt;walkDistance+=delta;
-  for(const p of procession){p.position.z-=delta;p.rotation.y=Math.PI;p.position.y=Math.sin(t*5+p.position.z)*.008}
-  if(royal[0]&&royal[0].position.z<=stageZ+1.5)seatEveryone();
+  for(const p of procession){p.position.z-=delta;p.rotation.y=royal.includes(p)?Math.PI:0;p.position.y=Math.sin(t*3+p.position.z)*.003}
+  if(royal[0]&&royal[0].position.z<=stageZ)seatEveryone();
  }
  controls.update();renderer.render(scene,camera);
 }
