@@ -1,4 +1,4 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none} .game-ui{position:absolute;left:10px;right:10px;bottom:12px;z-index:5;background:#211a25d9;border:1px solid #e9d1a355;border-radius:13px;padding:9px;color:#fff;font-size:11px;backdrop-filter:blur(9px)}.game-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:6px}.game-head strong{font-size:13px;color:#ffe3a2}.game-ui input,.game-ui select{background:#fff;color:#241a21;border:0;border-radius:6px;padding:7px;min-width:0}.game-ui button{background:#a53b48;color:white;border:1px solid #ffffff44;border-radius:7px;padding:7px;cursor:pointer}.game-ui button:disabled{opacity:.45}.game-row{display:flex;gap:5px;margin-top:6px}.game-row input{flex:1;width:70px}.game-row select{flex:1}.game-row button{white-space:nowrap}.game-progress{height:5px;background:#ffffff33;border-radius:8px;overflow:hidden}.game-progress span{display:block;height:100%;width:100%;background:#e9bd73}.game-note{margin-top:6px;color:#f3ddbb;font-size:10px}.live-hint{bottom:auto;top:9%}.status{bottom:170px}</style></head><body><main class="phone"><div id="scene"></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><section class="game-ui" aria-label="Düğün alayı kontrol paneli"><div class="game-head"><strong id="phase">Alay hazırlanıyor</strong><span id="timer">00:30</span><span id="count">0/90 kişi</span></div><div class="game-progress"><span id="progress"></span></div><div class="game-row"><input id="guestName" maxlength="22" placeholder="Katılımcı adı"><button id="join">Alaya katıl</button><button id="start">30 sn başlat</button></div><div class="game-row"><select id="track" aria-label="Müzik seçimi"><option value="0">1 · Alay toplanıyor</option><option value="1">2 · Düğün yürüyüşü</option><option value="2">3 · Düğün merasimi</option></select><button id="music">▶ Müzik aç</button><button id="gift">🎁 Hediye testi</button></div><div class="game-note" id="gameNote">Test modu · TikTok LIVE bağlantısı henüz yok</div></section><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none} .game-ui{position:absolute;left:10px;right:10px;bottom:12px;z-index:5;background:#211a25d9;border:1px solid #e9d1a355;border-radius:13px;padding:9px;color:#fff;font-size:11px;backdrop-filter:blur(9px)}.game-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:6px}.game-head strong{font-size:13px;color:#ffe3a2}.game-ui input,.game-ui select{background:#fff;color:#241a21;border:0;border-radius:6px;padding:7px;min-width:0}.game-ui button{background:#a53b48;color:white;border:1px solid #ffffff44;border-radius:7px;padding:7px;cursor:pointer}.game-ui button:disabled{opacity:.45}.game-row{display:flex;gap:5px;margin-top:6px}.game-row input{flex:1;width:70px}.game-row select{flex:1}.game-row button{white-space:nowrap}.game-progress{height:5px;background:#ffffff33;border-radius:8px;overflow:hidden}.game-progress span{display:block;height:100%;width:100%;background:#e9bd73}.game-note{margin-top:6px;color:#f3ddbb;font-size:10px}.live-hint{bottom:auto;top:9%}.status{bottom:170px}#joinToast{position:absolute;z-index:9;top:18%;left:9%;right:9%;text-align:center;background:#42253eea;border:1px solid #ffd48c;border-radius:16px;padding:14px 10px;font-size:18px;font-weight:800;color:#ffe4a8;opacity:0;transform:translateY(-20px) scale(.9);pointer-events:none;transition:opacity .35s,transform .35s}#joinToast.show{opacity:1;transform:translateY(0) scale(1)}#nameLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}.nameTag{position:absolute;transform:translate(-50%,-100%);background:#231721e8;color:#fff0b7;border:1px solid #f9d58c;border-radius:7px;padding:3px 6px;font-weight:800;font-size:clamp(10px,2.4vw,15px);white-space:nowrap;text-shadow:0 1px 2px #000;box-shadow:0 2px 7px #0008}</style></head><body><main class="phone"><div id="scene"></div><div id="nameLayer"></div><div id="joinToast"></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><section class="game-ui" aria-label="Düğün alayı kontrol paneli"><div class="game-head"><strong id="phase">Alay hazırlanıyor</strong><span id="timer">00:30</span><span id="count">0/90 kişi</span></div><div class="game-progress"><span id="progress"></span></div><div class="game-row"><input id="guestName" maxlength="22" placeholder="Katılımcı adı"><button id="join">Alaya katıl</button><button id="start">30 sn başlat</button></div><div class="game-row"><select id="track" aria-label="Müzik seçimi"><option value="0">1 · Alay toplanıyor</option><option value="1">2 · Düğün yürüyüşü</option><option value="2">3 · Düğün merasimi</option></select><button id="music">▶ Müzik aç</button><button id="gift">🎁 Hediye testi</button></div><div class="game-note" id="gameNote">Test modu · TikTok LIVE bağlantısı henüz yok</div></section><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
 import * as THREE from 'https://esm.sh/three@0.170.0';
 import {GLTFLoader} from 'https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js';
@@ -15,9 +15,9 @@ const $=id=>document.getElementById(id),MAX_GUESTS=90,roster=new Map();
 const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
 for(const p of people){if(['Erkek davetli','Kadın davetli','Mehteran'].includes(p.userData.name))p.visible=false;}
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
-const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.075;
+const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.055;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
-let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
+let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0,seatStartedAt=0;const moving=new Map();let toastTimeout;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
 const tracks=['ilk30saniye.mp3','yurume1.mp3','yurume2.mp3'];
 let musicOn=false;
@@ -41,10 +41,21 @@ function makeNameLabel(name){
 function cloneRole(role,name){
  const base=templates[role];if(!base)return null;
  const obj=base.clone(true);obj.traverse(o=>{if(o.isMesh){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone()}});
- obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=0;const label=makeNameLabel(name);obj.add(label);obj.userData.label=label;
+ obj.visible=true;obj.userData.name=name;obj.userData.role=role;obj.rotation.y=0;const tag=document.createElement('div');tag.className='nameTag';tag.textContent='@'+name;document.getElementById('nameLayer').appendChild(tag);obj.userData.nameTag=tag;
  scene.add(obj);return obj;
 }
-function slot(index){const row=Math.floor(index/2),side=index%2===0?-1:1;return {x:side*(.64+(row%3)*.13),z:entryZ+row*.49}}
+function slot(index){const row=Math.floor(index/2),side=index%2===0?-1:1;return {x:side*(.48+(row%3)*.12),z:entryZ+row*.56}}
+function repositionQueue(){
+ const all=[...roster.values()].reverse();
+ all.forEach((p,i)=>{const target=slot(i);p.userData.queueTarget=new THREE.Vector3(target.x,0,target.z-walkDistance);});
+}
+function toastJoin(username){
+ const toast=document.getElementById('joinToast');toast.textContent='🎉 @'+username+' düğüne katıldı!';
+ toast.classList.remove('show');void toast.offsetWidth;toast.classList.add('show');
+ clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>toast.classList.remove('show'),3200);
+}
+function moveTo(p,target,duration=9){moving.set(p,{from:p.position.clone(),to:target.clone(),start:performance.now(),duration:duration*1000});}
+
 function joinGuest(name,role='male'){
  const username=String(name||'').trim().replace(/^@/,'').slice(0,24);if(!username)return false;
  if(roster.has(username))return role===roster.get(username).userData.role?true:changeRole(username,role);
@@ -52,17 +63,17 @@ function joinGuest(name,role='male'){
  if(phase==='idle'||phase==='finished'){showNote('Önce 30 saniyelik sayacı başlatın');return false}
  if(!roles.includes(role))role='male';
  const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
- obj.position.set(point.x,0,point.z-walkDistance);obj.userData.slot=index;
- roster.set(username,obj);procession.push(obj);
+ obj.position.set(point.x,0,entryZ+2.8-walkDistance);obj.userData.slot=index;
+ roster.set(username,obj);procession.push(obj);repositionQueue();toastJoin(username);
  $('count').textContent=roster.size+'/90 kişi';showNote(username+' alaya katıldı · '+roleNames[role]);return true;
 }
 function changeRole(username,role){
  const old=roster.get(username);if(!old||!roles.includes(role))return false;
  if(old.userData.role===role)return true;
  const replacement=cloneRole(role,username);if(!replacement)return false;
- replacement.position.copy(old.position);replacement.rotation.copy(old.rotation);replacement.userData.slot=old.userData.slot;
+ replacement.position.copy(old.position);replacement.rotation.copy(old.rotation);replacement.userData.slot=old.userData.slot;replacement.userData.queueTarget=old.userData.queueTarget;if(old.userData.nameTag)old.userData.nameTag.remove();
  const index=procession.indexOf(old);if(index>=0)procession[index]=replacement;
- roster.set(username,replacement);scene.remove(old);showNote(username+' artık '+roleNames[role]);return true;
+ roster.set(username,replacement);scene.remove(old);repositionQueue();showNote(username+' artık '+roleNames[role]);return true;
 }
 function receiveGift(name,gift='music'){
  // Hediye haritası LIVE sağlayıcısının gerçek hediye ID'leriyle sonradan bağlanabilir.
@@ -77,45 +88,27 @@ function beginMarch(){
  switchTrack(1);showNote('Yürüyüş başladı · Yürürken katılım ve karakter değiştirme açık');
 }
 function seatEveryone(){
- phase='finished';$('phase').textContent='Düğün merasimi';$('timer').textContent='TÖREN';
- // V3 modelinin gerçek GLB koordinatları: iki taht x=±1.15,z=-10.65,
- // 36 sandalye x=±3.3/4.45/5.6 ve z=-7.8..-2.05,
- // mehter sahnesi x=-10.8,z=-3.5. Meydan ölçeği 0.32.
- const scale=.32;
- // Sandalye/taht konumlarını modelin dünya koordinatlarından tespit et.
- const chairs=[];const thrones=[];
+ phase='seating';seatStartedAt=performance.now();$('phase').textContent='Davetliler yerlerine geçiyor';$('timer').textContent='YERLEŞİM';
+ const chairs=[],thrones=[];
  if(courtyard){courtyard.updateMatrixWorld(true);courtyard.traverse(o=>{
-   if(!o.isMesh)return;const n=(o.name||'').toLowerCase();
-   if(!/chair|seat|sandalye|throne|taht/.test(n))return;
-   const bounds=new THREE.Box3().setFromObject(o);if(bounds.isEmpty())return;
-   const p=bounds.getCenter(new THREE.Vector3());
-   if(/throne|taht/.test(n))thrones.push(p);else chairs.push(p);
+  if(!o.isMesh)return;
+  const n=(o.name||'').toLowerCase();if(!/chair|seat|sandalye|throne|taht/.test(n))return;
+  const b=new THREE.Box3().setFromObject(o);if(b.isEmpty())return;
+  const p=b.getCenter(new THREE.Vector3());if(/throne|taht/.test(n))thrones.push(p);else chairs.push(p);
  });}
- const uniquePositions=(arr)=>arr.filter((p,i)=>arr.findIndex(q=>p.distanceToSquared(q)<.025)===i);
- const realChairs=uniquePositions(chairs).sort((a,b)=>a.z-b.z||a.x-b.x);
- const realThrones=uniquePositions(thrones).sort((a,b)=>a.x-b.x);
- royal.forEach((p,i)=>{
-   const target=realThrones[i];p.position.set(target?target.x:(i===0?-1.15:1.15)*scale,target?target.y+.10:.46*scale+.16,target?target.z:-10.65*scale);
-   p.rotation.y=0;p.scale.y*=.73;
- });
+ const unique=(arr)=>arr.filter((p,i)=>arr.findIndex(q=>p.distanceToSquared(q)<.045)===i);
+ const seats=unique(chairs).sort((a,b)=>a.z-b.z||a.x-b.x);
+ const throneSeats=unique(thrones).sort((a,b)=>a.x-b.x);
+ royal.forEach((p,i)=>{const target=throneSeats[i]||new THREE.Vector3((i===0?-.37:.37),0,-3.4);moveTo(p,new THREE.Vector3(target.x,0,target.z),18+i*2)});
  const guests=[...roster.values()].filter(p=>p.userData.role!=='mehter');
  const band=[...roster.values()].filter(p=>p.userData.role==='mehter');
- const chairX=[-3.3,-4.45,-5.6,3.3,4.45,5.6];
  guests.forEach((p,i)=>{
-   const chairRow=Math.floor(i/6),x=chairX[i%6]*scale;
-   if(i<realChairs.length){const c=realChairs[i];p.position.set(c.x,c.y+.08,c.z);p.scale.y*=.75;p.rotation.y=0;
-   }else if(chairRow<6){
-     p.position.set(x,.54*scale+.12,(-7.8+chairRow*1.15)*scale);
-     p.scale.y*=.75;p.rotation.y=0;
-   }else{
-     const overflow=i-36,side=overflow%2===0?-1:1;
-     p.position.set(side*(2.15+Math.floor(overflow/12)*.5),0,-2+Math.floor(overflow/2)%6*.4);
-     p.rotation.y=0;
-   }
+  // Sandalye bulunamazsa kullanıcıyı sandalyeye ışınlamak yerine alaydan yürüyerek ayrılan bir sıra oluştur.
+  const c=seats[i]||new THREE.Vector3((i%2?1:-1)*(1.2+Math.floor(i/12)*.38),0,-2.3+Math.floor(i/2)%6*.45);
+  moveTo(p,new THREE.Vector3(c.x,0,c.z),19+i*.5);
  });
- band.forEach((p,i)=>{p.position.set((-10.8+(i%5-2)*1.1)*scale,.43*scale,(-3.5+Math.floor(i/5)*1.05)*scale);p.rotation.y=0});
- switchTrack(2);
- showNote('Tören başladı · 36 sandalye dolana kadar oturma düzeni; mehter sahnede');
+ band.forEach((p,i)=>moveTo(p,new THREE.Vector3(-3.45+(i%5)*.30,0,-1.1+Math.floor(i/5)*.32),22+i*.35));
+ showNote('Davetliler sandalyelere yürüyerek yerleşiyor');
 }
 function beginCountdown(){
  if(phase!=='idle')return;phase='countdown';startedAt=performance.now();
@@ -158,10 +151,25 @@ function animate(){
  }
  if(phase==='march'){
   const delta=walkSpeed*dt;walkDistance+=delta;
-  for(const p of procession){p.position.z-=delta;p.rotation.y=royal.includes(p)?Math.PI:0;p.position.y=Math.sin(t*3+p.position.z)*.003}
+  for(const p of royal){p.position.z-=delta;p.rotation.y=Math.PI;p.position.y=Math.sin(t*3+p.position.z)*.003}for(const p of roster.values()){if(p.userData.queueTarget)p.userData.queueTarget.z-=delta;}
   if(royal[0]&&royal[0].position.z<=stageZ)seatEveryone();
  }
+ for(const p of roster.values()){
+  if((phase==='march'||phase==='countdown')&&p.userData.queueTarget&&!moving.has(p)){
+   const d=p.userData.queueTarget.clone().sub(p.position);const step=Math.min(1,dt*.42);
+   p.position.addScaledVector(d,step);
+  }
+ }
+ for(const [p,m] of moving){const a=Math.min(1,(now-m.start)/m.duration);const eased=a*a*(3-2*a);p.position.lerpVectors(m.from,m.to,eased);if(a>=1){moving.delete(p);p.userData.seated=true;p.scale.y*=.77;}}
+ if(phase==='seating'&&moving.size===0){phase='finished';$('phase').textContent='Düğün merasimi';$('timer').textContent='TÖREN';switchTrack(2);}
  controls.update();renderer.render(scene,camera);
+ const screenW=host.clientWidth,screenH=host.clientHeight;
+ for(const p of roster.values()){const tag=p.userData.nameTag;if(!tag)continue;
+  const v=new THREE.Vector3(0,.68,0);p.localToWorld(v);v.project(camera);
+  const visible=v.z>-1&&v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+  tag.style.display=visible?'block':'none';
+  if(visible){tag.style.left=((v.x+1)*.5*screenW)+'px';tag.style.top=((1-v.y)*.5*screenH)+'px';}
+ }
 }
 animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
 </script></body></html>
