@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);let role='female';const channel=new Broa
 const local=['localhost','127.0.0.1'].includes(location.hostname);
 $('connection').textContent=local?'Yerel köprü modu: komutlar yayın ekranına aktarılır.':'Aynı tarayıcıdaki yayın sekmesiyle bağlantı modu.';
 function send(command){
- channel.postMessage(command);
+ if(!local)channel.postMessage(command);
  if(local)fetch('/command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(command)}).catch(e=>{$('connection').textContent='Yerel köprü hatası: '+e.message});
 }
 document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{role=b.dataset.role;document.querySelectorAll('[data-role]').forEach(x=>x.classList.toggle('active',x===b));$('username').focus()});
