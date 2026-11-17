@@ -1,4 +1,4 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none} .game-ui{position:absolute;left:10px;right:10px;bottom:12px;z-index:5;background:#211a25d9;border:1px solid #e9d1a355;border-radius:13px;padding:9px;color:#fff;font-size:11px;backdrop-filter:blur(9px)}.game-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:6px}.game-head strong{font-size:13px;color:#ffe3a2}.game-ui input,.game-ui select{background:#fff;color:#241a21;border:0;border-radius:6px;padding:7px;min-width:0}.game-ui button{background:#a53b48;color:white;border:1px solid #ffffff44;border-radius:7px;padding:7px;cursor:pointer}.game-ui button:disabled{opacity:.45}.game-row{display:flex;gap:5px;margin-top:6px}.game-row input{flex:1;width:70px}.game-row select{flex:1}.game-row button{white-space:nowrap}.game-progress{height:5px;background:#ffffff33;border-radius:8px;overflow:hidden}.game-progress span{display:block;height:100%;width:100%;background:#e9bd73}.game-note{margin-top:6px;color:#f3ddbb;font-size:10px}.live-hint{bottom:auto;top:9%}.status{bottom:170px}#joinToast{position:absolute;z-index:9;top:18%;left:9%;right:9%;text-align:center;background:#42253eea;border:1px solid #ffd48c;border-radius:16px;padding:14px 10px;font-size:18px;font-weight:800;color:#ffe4a8;opacity:0;transform:translateY(-20px) scale(.9);pointer-events:none;transition:opacity .35s,transform .35s}#joinToast.show{opacity:1;transform:translateY(0) scale(1)}#nameLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}.nameTag{position:absolute;transform:translate(-50%,-100%);background:#231721e8;color:#fff0b7;border:1px solid #f9d58c;border-radius:7px;padding:3px 6px;font-weight:800;font-size:clamp(10px,2.4vw,15px);white-space:nowrap;text-shadow:0 1px 2px #000;box-shadow:0 2px 7px #0008}body .game-ui,body .live-hint,body .status{display:none!important}.countdown-control{position:absolute;z-index:10;bottom:22px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}.countdown-control button{background:#763747e8;border:1px solid #f3ce89;color:#fff4da;border-radius:30px;padding:12px 23px;font:700 14px system-ui;cursor:pointer;box-shadow:0 6px 22px #0006}.countdown-control button:disabled{display:none}.countdown-clock{display:none;background:#211625c9;border:1px solid #f3ce89;color:#ffe2a3;border-radius:18px;padding:9px 17px;font:800 23px Georgia,serif;text-shadow:0 2px 6px #000}.countdown-clock.active{display:inline-block}#joinToast{background:linear-gradient(115deg,#31182aee,#683d40ef,#31182aee);border:2px solid #f6d18a;box-shadow:0 9px 30px #0009,0 0 20px #e8b76466;font-family:Georgia,serif;letter-spacing:.3px}</style></head><body><main class="phone"><div id="scene"></div><div id="nameLayer"></div><div id="joinToast"></div><div class="countdown-control"><button id="publicStart">⏱ 30 SANİYEYİ BAŞLAT</button><div id="publicTimer" class="countdown-clock">00:30</div></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><section class="game-ui" aria-label="Düğün alayı kontrol paneli"><div class="game-head"><strong id="phase">Alay hazırlanıyor</strong><span id="timer">00:30</span><span id="count">0/90 kişi</span></div><div class="game-progress"><span id="progress"></span></div><div class="game-row"><input id="guestName" maxlength="22" placeholder="Katılımcı adı"><button id="join">Alaya katıl</button><button id="start">30 sn başlat</button></div><div class="game-row"><select id="track" aria-label="Müzik seçimi"><option value="0">1 · Alay toplanıyor</option><option value="1">2 · Düğün yürüyüşü</option><option value="2">3 · Düğün merasimi</option></select><button id="music">▶ Müzik aç</button><button id="gift">🎁 Hediye testi</button></div><div class="game-note" id="gameNote">Test modu · TikTok LIVE bağlantısı henüz yok</div></section><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hürrem ve Kanuni | Saray Düğünü 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#16131b;color:#f8eedb;font-family:system-ui;display:grid;place-items:center;min-height:100dvh}.phone{width:min(100vw,calc(100dvh * 9 / 16));height:min(100dvh,calc(100vw * 16 / 9));aspect-ratio:9/16;position:relative;overflow:hidden;background:#b9c8d4}#scene{width:100%;height:100%}.top{position:absolute;top:3%;width:100%;text-align:center;pointer-events:none;text-shadow:0 2px 8px #0009}.top small{letter-spacing:2px;font-size:10px}.top h1{font:700 26px Georgia,serif;margin:8px 0}.status{position:absolute;bottom:16px;left:14px;right:14px;background:#241a21cc;border:1px solid #ffffff33;border-radius:12px;padding:12px;font-size:12px;line-height:1.6}.status b{color:#f5c56d}.status button{background:#a3414b;color:white;border:0;padding:7px 12px;border-radius:7px;cursor:pointer;margin-top:5px}.top{top:5%;}.top h1{font-size:clamp(19px,5vw,27px)}.status{bottom:8px;left:10px;right:auto;max-width:75%;padding:5px 8px;font-size:10px;opacity:.75}.status.ready{display:none}.live-label{position:absolute;top:2%;left:12px;font-size:10px;letter-spacing:1px;color:#fff9df;background:#5c3447a6;padding:6px 10px;border-radius:16px;pointer-events:none}.live-hint{position:absolute;bottom:3%;right:12px;color:#fff;font-size:10px;text-shadow:0 1px 4px #000a;pointer-events:none} .game-ui{position:absolute;left:10px;right:10px;bottom:12px;z-index:5;background:#211a25d9;border:1px solid #e9d1a355;border-radius:13px;padding:9px;color:#fff;font-size:11px;backdrop-filter:blur(9px)}.game-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:6px}.game-head strong{font-size:13px;color:#ffe3a2}.game-ui input,.game-ui select{background:#fff;color:#241a21;border:0;border-radius:6px;padding:7px;min-width:0}.game-ui button{background:#a53b48;color:white;border:1px solid #ffffff44;border-radius:7px;padding:7px;cursor:pointer}.game-ui button:disabled{opacity:.45}.game-row{display:flex;gap:5px;margin-top:6px}.game-row input{flex:1;width:70px}.game-row select{flex:1}.game-row button{white-space:nowrap}.game-progress{height:5px;background:#ffffff33;border-radius:8px;overflow:hidden}.game-progress span{display:block;height:100%;width:100%;background:#e9bd73}.game-note{margin-top:6px;color:#f3ddbb;font-size:10px}.live-hint{bottom:auto;top:9%}.status{bottom:170px}#joinToast{position:absolute;z-index:9;top:18%;left:9%;right:9%;text-align:center;background:#42253eea;border:1px solid #ffd48c;border-radius:16px;padding:14px 10px;font-size:18px;font-weight:800;color:#ffe4a8;opacity:0;transform:translateY(-20px) scale(.9);pointer-events:none;transition:opacity .35s,transform .35s}#joinToast.show{opacity:1;transform:translateY(0) scale(1)}#nameLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}.nameTag{position:absolute;transform:translate(-50%,-100%);background:#231721e8;color:#fff0b7;border:1px solid #f9d58c;border-radius:7px;padding:3px 6px;font-weight:800;font-size:clamp(10px,2.4vw,15px);white-space:nowrap;text-shadow:0 1px 2px #000;box-shadow:0 2px 7px #0008}.royalTag{background:#493016e9;border-color:#ffe29b;color:#fff4c7}body .game-ui,body .live-hint,body .status{display:none!important}.countdown-control{position:absolute;z-index:10;bottom:22px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}.countdown-control button{background:#763747e8;border:1px solid #f3ce89;color:#fff4da;border-radius:30px;padding:12px 23px;font:700 14px system-ui;cursor:pointer;box-shadow:0 6px 22px #0006}.countdown-control button:disabled{display:none}.countdown-clock{display:none;background:#211625c9;border:1px solid #f3ce89;color:#ffe2a3;border-radius:18px;padding:9px 17px;font:800 23px Georgia,serif;text-shadow:0 2px 6px #000}.countdown-clock.active{display:inline-block}#joinToast{background:linear-gradient(115deg,#31182aee,#683d40ef,#31182aee);border:2px solid #f6d18a;box-shadow:0 9px 30px #0009,0 0 20px #e8b76466;font-family:Georgia,serif;letter-spacing:.3px}</style></head><body><main class="phone"><div id="scene"></div><div id="nameLayer"></div><div id="joinToast"></div><div class="countdown-control"><button id="publicStart">⏱ 30 SANİYEYİ BAŞLAT</button><div id="publicTimer" class="countdown-clock">00:30</div></div><div class="top"><small>KANUNİ & HÜRREM · DÜĞÜN ALAYI</small><h1>Kanuni &amp; Hürrem</h1></div><div class="live-label">✦ SARAY DÜĞÜNÜ</div><div class="live-hint">Fareyle kamerayı hareket ettir</div><section class="game-ui" aria-label="Düğün alayı kontrol paneli"><div class="game-head"><strong id="phase">Alay hazırlanıyor</strong><span id="timer">00:30</span><span id="count">0/90 kişi</span></div><div class="game-progress"><span id="progress"></span></div><div class="game-row"><input id="guestName" maxlength="22" placeholder="Katılımcı adı"><button id="join">Alaya katıl</button><button id="start">30 sn başlat</button></div><div class="game-row"><select id="track" aria-label="Müzik seçimi"><option value="0">1 · Alay toplanıyor</option><option value="1">2 · Düğün yürüyüşü</option><option value="2">3 · Düğün merasimi</option></select><button id="music">▶ Müzik aç</button><button id="gift">🎁 Hediye testi</button></div><div class="game-note" id="gameNote">Test modu · TikTok LIVE bağlantısı henüz yok</div></section><div class="status" id="status">3D modeller yükleniyor…</div></main><script type="module">
 import * as THREE from 'https://esm.sh/three@0.170.0';
 import {GLTFLoader} from 'https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js';
@@ -18,7 +18,7 @@ for(const p of people){if(['Erkek davetli','Kadın davetli','Mehteran'].includes
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
 const procession=[...royal],entryZ=8.3,stageZ=-3.35,walkSpeed=.055;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
-const royalOwners={hurrem:null,kanuni:null},royalExpiry={hurrem:0,kanuni:0};const normalRoles=new Map();
+const royalOwners={hurrem:null,kanuni:null},royalExpiry={hurrem:0,kanuni:0};const normalRoles=new Map();const royalLabels={};let cameraMode='wide';const cameraModes=['wide','royal','bird','right','people','front'];
 let phase='idle',startedAt=0,marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0,seatStartedAt=0;const moving=new Map();let toastTimeout;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
 const tracks=['ilk30saniye.mp3','yurume1.mp3','yurume2.mp3'];
@@ -77,32 +77,28 @@ function changeRole(username,role){
  const index=procession.indexOf(old);if(index>=0)procession[index]=replacement;
  roster.set(username,replacement);scene.remove(old);if(roles.includes(role))normalRoles.set(username,role);repositionQueue();toastJoin(username+' · '+({female:'Kadın davetli',male:'Erkek davetli',mehter:'Mehteran',hurrem:'Hürrem Sultan',kanuni:'Kanuni Sultan Süleyman'})[role]);showNote(username+' artık '+(roleNames[role]||role));return true;
 }
+function getRoyal(role){return royal.find(p=>p.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'))}
+function clearRoyal(role){const old=royalOwners[role];royalOwners[role]=null;royalExpiry[role]=0;if(royalLabels[role]){royalLabels[role].remove();delete royalLabels[role]}return old}
+function removeGuest(name,notify=true){
+ const username=String(name||'').trim().replace(/^@/,'');let removed=false;
+ for(const role of ['hurrem','kanuni'])if(royalOwners[role]===username){clearRoyal(role);removed=true}
+ const p=roster.get(username);
+ if(p){p.userData.nameTag?.remove();moving.delete(p);scene.remove(p);roster.delete(username);normalRoles.delete(username);const i=procession.indexOf(p);if(i>=0)procession.splice(i,1);repositionQueue();$('count').textContent=roster.size+'/90 kişi';removed=true}
+ if(removed){if(notify)showNote('@'+username+' alaydan çıkarıldı');reportToPanel({changed:true})}return removed;
+}
 function awardRoyal(name,role){
- const username=String(name||'').trim().replace(/^@/,'').slice(0,24);
- if(!username||phase==='finished')return false;
- // Bir tahtta aynı anda tek kullanıcı bulunur. Yeni hediye eski saltanatı bitirir.
- const prior=royalOwners[role];
- if(prior&&prior!==username)changeRole(prior,normalRoles.get(prior)||'male');
- for(const other of ['hurrem','kanuni'])if(other!==role&&royalOwners[other]===username)royalOwners[other]=null;
- if(!roster.has(username))joinGuest(username,'male');
- if(!changeRole(username,role))return false;
- royalOwners[role]=username;royalExpiry[role]=performance.now()+60000;
- const p=roster.get(username),original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));
- if(original){original.visible=false;moveTo(p,original.position.clone(),5);}
+ const username=String(name||'').trim().replace(/^@/,'').slice(0,24);if(!username)return false;
+ for(const other of ['hurrem','kanuni'])if(other!==role&&royalOwners[other]===username)clearRoyal(other);
+ clearRoyal(role);if(roster.has(username))removeGuest(username,false);
+ const tag=document.createElement('div');tag.className='nameTag royalTag';tag.textContent='👑 @'+username;
+ document.getElementById('nameLayer').appendChild(tag);royalLabels[role]=tag;royalOwners[role]=username;royalExpiry[role]=performance.now()+60000;
  toastJoin(username+' · '+(role==='hurrem'?'Hürrem Sultan':'Kanuni Sultan Süleyman')+' (60 sn)');
- showNote('@'+username+' 60 saniyeliğine '+(role==='hurrem'?'Hürrem Sultan':'Kanuni')+' oldu');
- return true;
+ reportToPanel({changed:true});return true;
 }
 function receiveGift(name,gift='female'){
  const action=String(gift).toLowerCase();
  if(action==='hurrem'||action==='kanuni')return awardRoyal(name,action);
- if(roles.includes(action)){
-  const username=String(name||'').trim().replace(/^@/,'');
-  for(const role of ['hurrem','kanuni'])if(royalOwners[role]===username){
-   royalOwners[role]=null;const original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));if(original)original.visible=true;
-  }
-  return joinGuest(username,action);
- }
+ if(roles.includes(action)){const username=String(name||'').trim().replace(/^@/,'');for(const role of ['hurrem','kanuni'])if(royalOwners[role]===username)clearRoyal(role);return joinGuest(username,action)}
  return false;
 }
 function beginMarch(){
@@ -172,18 +168,20 @@ const panelChannel=new BroadcastChannel('hurrem-control-v1');
 function handlePanelCommand(cmd){
  if(!cmd||typeof cmd!=='object')return;
  if(cmd.type==='join')receiveGift(cmd.username,cmd.role);
+ if(cmd.type==='remove')removeGuest(cmd.username);
+ if(cmd.type==='camera')cameraMode=cameraModes.includes(cmd.mode)?cmd.mode:'wide';
  if(cmd.type==='start')beginCountdown();
  if(cmd.type==='march')beginMarch();
  if(cmd.type==='music'){musicOn=true;switchTrack(Number(cmd.track)||0);audioPlayer.play().catch(()=>showNote('Yayın sesini açmak için oyun ekranında bir kez tıklayın'));}
  if(cmd.type==='stopMusic'){musicOn=false;audioPlayer.pause();}
- if(cmd.type==='cameraReset'){camera.position.set(0,4.5,12.7);controls.target.set(0,0,1.2);controls.update();}
+ if(cmd.type==='cameraReset')cameraMode='wide';
 }
 const panelInstance='game-'+Math.random().toString(36).slice(2);
-function reportToPanel(payload){panelChannel.postMessage({type:'game-status',instance:panelInstance,phase,guestCount:roster.size,...payload});}
+function reportToPanel(payload){panelChannel.postMessage({type:'game-status',instance:panelInstance,phase,guestCount:roster.size,guests:[...roster.values()].map(p=>({username:p.userData.name,role:p.userData.role})).concat(['hurrem','kanuni'].filter(r=>royalOwners[r]).map(r=>({username:royalOwners[r],role:r}))),cameraMode,...payload});}
 panelChannel.onmessage=e=>{
  const cmd=e.data;
  if(cmd?.type==='ping'){reportToPanel({replyTo:cmd.id});return;}
- if(cmd?.type==='join'||cmd?.type==='start'||cmd?.type==='march'||cmd?.type==='music'||cmd?.type==='stopMusic'||cmd?.type==='cameraReset'){
+ if(['join','remove','camera','start','march','music','stopMusic','cameraReset'].includes(cmd?.type)){
   handlePanelCommand(cmd);reportToPanel({replyTo:cmd.id||null,accepted:true});
  }
 };
@@ -234,7 +232,7 @@ function animate(){
   for(const p of royal){p.position.z-=delta;p.rotation.y=Math.PI;p.position.y=Math.sin(t*3+p.position.z)*.003}for(const p of roster.values()){if(p.userData.queueTarget)p.userData.queueTarget.z-=delta;}
   if(royal[0]&&royal[0].position.z<=stageZ)seatEveryone();
  }
- for(const role of ['hurrem','kanuni']){if(royalOwners[role]&&now>=royalExpiry[role]){const username=royalOwners[role];royalOwners[role]=null;const original=royal.find(r=>r.userData.name===(role==='hurrem'?'Hürrem':'Kanuni'));if(original)original.visible=true;changeRole(username,normalRoles.get(username)||'male');showNote('@'+username+' için 60 saniyelik saltanat sona erdi');}}
+ for(const role of ['hurrem','kanuni'])if(royalOwners[role]&&now>=royalExpiry[role]){const username=clearRoyal(role);showNote('@'+username+' için 60 saniyelik saltanat sona erdi');reportToPanel({changed:true});}
  for(const p of roster.values()){
   if((phase==='march'||phase==='countdown')&&p.userData.queueTarget&&!moving.has(p)){
    const d=p.userData.queueTarget.clone().sub(p.position);const step=Math.min(1,dt*.42);
@@ -243,14 +241,24 @@ function animate(){
  }
  for(const [p,m] of moving){const a=Math.min(1,(now-m.start)/m.duration);const eased=a*a*(3-2*a);p.position.lerpVectors(m.from,m.to,eased);if(a>=1){moving.delete(p);p.userData.seated=true;p.scale.y*=.77;}}
  if(phase==='seating'&&moving.size===0){phase='finished';$('phase').textContent='Düğün merasimi';$('timer').textContent='TÖREN';switchTrack(2);}
- controls.update();renderer.render(scene,camera);
+ const center=royal[0]&&royal[1]?royal[0].position.clone().add(royal[1].position).multiplyScalar(.5):new THREE.Vector3();
+ const guests=[...roster.values()],peopleCenter=guests.length?guests.reduce((v,p)=>v.add(p.position),new THREE.Vector3()).multiplyScalar(1/guests.length):center.clone().add(new THREE.Vector3(0,0,2.5));
+ const focus=new THREE.Vector3(),offset=new THREE.Vector3();
+ if(cameraMode==='royal'){focus.copy(center).add(new THREE.Vector3(0,.45,0));offset.set(0,1.55,2.9)}
+ else if(cameraMode==='bird'){focus.copy(center).lerp(peopleCenter,.5);offset.set(0,13.5,2)}
+ else if(cameraMode==='right'){focus.copy(center).add(new THREE.Vector3(0,.4,0));offset.set(3.4,2.1,3.4)}
+ else if(cameraMode==='people'){focus.copy(peopleCenter).add(new THREE.Vector3(0,.35,0));offset.set(0,2.5,4.2)}
+ else if(cameraMode==='front'){focus.copy(center).add(new THREE.Vector3(0,.45,0));offset.set(-2.6,1.7,2.4)}
+ else{focus.copy(center).lerp(peopleCenter,.28);offset.set(0,4.5,10.5)}
+ camera.position.lerp(focus.clone().add(offset),Math.min(1,dt*2.2));controls.target.lerp(focus,Math.min(1,dt*2.2));controls.update();renderer.render(scene,camera);
  const screenW=host.clientWidth,screenH=host.clientHeight;
  for(const p of roster.values()){const tag=p.userData.nameTag;if(!tag)continue;
-  const v=new THREE.Vector3(0,.68,0);p.localToWorld(v);v.project(camera);
+  const v=new THREE.Vector3(0,.94,0);p.localToWorld(v);v.project(camera);
   const visible=v.z>-1&&v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
   tag.style.display=visible?'block':'none';
   if(visible){tag.style.left=((v.x+1)*.5*screenW)+'px';tag.style.top=((1-v.y)*.5*screenH)+'px';}
  }
+ for(const role of ['hurrem','kanuni']){const tag=royalLabels[role],p=getRoyal(role);if(!tag||!p)continue;const v=new THREE.Vector3(0,1.12,0);p.localToWorld(v);v.project(camera);const visible=v.z>-1&&v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;tag.style.display=visible?'block':'none';if(visible){tag.style.left=((v.x+1)*.5*screenW)+'px';tag.style.top=((1-v.y)*.5*screenH)+'px';}}
 }
 animate();addEventListener('resize',()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)});
 </script></body></html>
