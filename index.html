@@ -14,7 +14,7 @@ if(courtyard){courtyard.updateMatrixWorld(true);
 const $=id=>document.getElementById(id),MAX_GUESTS=90,roster=new Map();
 const templates={male:people.find(p=>p.userData.name==='Erkek davetli'),female:people.find(p=>p.userData.name==='Kadın davetli'),mehter:people.find(p=>p.userData.name==='Mehteran')};
 const royal=people.filter(p=>['Kanuni','Hürrem'].includes(p.userData.name));
-const procession=[...royal],entryZ=20.5,stageZ=-11,walkSpeed=.12;
+const procession=[...royal],entryZ=15.1,stageZ=-3.35,walkSpeed=.24;
 const roles=['male','female','mehter'],roleNames={male:'Erkek davetli',female:'Kadın davetli',mehter:'Mehteran'};
 let phase='countdown',startedAt=performance.now(),marchStart=0,walkDistance=0,previousFrame=performance.now(),trackIndex=0;
 const audioPlayer=new Audio();audioPlayer.loop=true;audioPlayer.volume=.55;
@@ -38,7 +38,7 @@ function joinGuest(name,role='male'){
  const username=String(name||'').trim().slice(0,22);if(!username)return false;
  if(roster.has(username))return changeRole(username,role);
  if(roster.size>=MAX_GUESTS){showNote('90 kişilik alay doldu');return false}
- if(phase==='finished'){showNote('Tören sona erdi');return false}
+ if(phase==='finished'){showNote('Tören başladı; katılım kapandı');return false}
  if(!roles.includes(role))role='male';
  const index=roster.size,point=slot(index),obj=cloneRole(role,username);if(!obj)return false;
  obj.position.set(point.x,0,point.z-walkDistance);obj.userData.slot=index;
@@ -67,14 +67,31 @@ function beginMarch(){
 }
 function seatEveryone(){
  phase='finished';$('phase').textContent='Düğün merasimi';$('timer').textContent='TÖREN';
- // Tahtın kesin koordinatları modelin iç düğüm konumlarına göre kalibre edilebilir.
- royal.forEach((p,i)=>{p.position.set(i===0?-.4:.4,.25,stageZ);p.rotation.y=0});
- for(const [name,p] of roster){
-  const idx=p.userData.slot;
-  if(p.userData.role==='mehter'){p.position.set(-2.5+(idx%7)*.52,0,stageZ+1.8);p.rotation.y=0}
-  else {const row=Math.floor(idx/2);p.position.set((idx%2===0?-1:1)*2.3,0,stageZ+2.5+row*.44);p.rotation.y=0}
- }
- switchTrack(2);showNote('Tören başladı · Mehter sahnede, davetliler oturma alanında');
+ // V3 modelinin gerçek GLB koordinatları: iki taht x=±1.15,z=-10.65,
+ // 36 sandalye x=±3.3/4.45/5.6 ve z=-7.8..-2.05,
+ // mehter sahnesi x=-10.8,z=-3.5. Meydan ölçeği 0.32.
+ const scale=.32;
+ royal.forEach((p,i)=>{
+   p.position.set((i===0?-1.15:1.15)*scale,.46*scale+.16,-10.65*scale);
+   p.rotation.y=0;p.scale.y*=.73;
+ });
+ const guests=[...roster.values()].filter(p=>p.userData.role!=='mehter');
+ const band=[...roster.values()].filter(p=>p.userData.role==='mehter');
+ const chairX=[-3.3,-4.45,-5.6,3.3,4.45,5.6];
+ guests.forEach((p,i)=>{
+   const chairRow=Math.floor(i/6),x=chairX[i%6]*scale;
+   if(chairRow<6){
+     p.position.set(x,.54*scale+.12,(-7.8+chairRow*1.15)*scale);
+     p.scale.y*=.75;p.rotation.y=0;
+   }else{
+     const overflow=i-36,side=overflow%2===0?-1:1;
+     p.position.set(side*(2.15+Math.floor(overflow/12)*.5),0,-2+Math.floor(overflow/2)%6*.4);
+     p.rotation.y=0;
+   }
+ });
+ band.forEach((p,i)=>{p.position.set((-10.8+(i%5-2)*1.1)*scale,.43*scale,(-3.5+Math.floor(i/5)*1.05)*scale);p.rotation.y=0});
+ switchTrack(2);
+ showNote('Tören başladı · 36 sandalye dolana kadar oturma düzeni; mehter sahnede');
 }
 window.weddingLive={join:joinGuest,gift:receiveGift,changeRole,start:beginMarch};
 $('join').onclick=()=>{if(joinGuest($('guestName').value,roles[roster.size%3]))$('guestName').value=''};
